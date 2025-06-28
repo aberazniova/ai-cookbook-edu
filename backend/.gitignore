@@ -1,0 +1,19 @@
+config/master.key
+log
+tmp
+.bundle
+vendor/bundle
+public/assets
+public/packs
+public/uploads
+public/system
+storage/
+
+# Ignore Kamal deployment directory
+.kamal/
+
+# Ignore environment variables
+**/.env
+
+# Ignore log files
+*.log
