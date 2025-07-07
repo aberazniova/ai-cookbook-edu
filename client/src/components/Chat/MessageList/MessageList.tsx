@@ -1,8 +1,8 @@
-
-import Message from './Message/Message';
+import Message from 'components/Chat/MessageList/Message/Message';
+import { type Message as MessageType } from 'types/messages';
 
 function MessageList() {
-  const messages = [
+  const messages: MessageType[] = [
     {
       text: "Hi there! How can I help you with recipes today?",
       isUserMessage: false

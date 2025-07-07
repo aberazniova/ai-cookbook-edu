@@ -1,4 +1,6 @@
-function Message({ message }) {
+import { type Message as MessageType } from 'types/messages';
+
+function Message({ message }: { message: MessageType }) {
   const { text, isUserMessage } = message;
 
   const color = isUserMessage ? 'bg-emerald-100 dark:bg-emerald-900' : 'bg-stone-200 dark:bg-neutral-700';

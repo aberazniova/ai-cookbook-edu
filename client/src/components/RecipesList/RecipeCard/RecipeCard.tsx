@@ -1,7 +1,9 @@
 import { Card } from 'flowbite-react';
 import { FaLeaf } from 'react-icons/fa';
 
-function RecipeCard({ recipe }) {
+import { type RecipeCard as RecipeCardType } from 'types/recipes';
+
+function RecipeCard({ recipe }: { recipe: RecipeCardType }) {
   return (
     <Card
       key={recipe.id}

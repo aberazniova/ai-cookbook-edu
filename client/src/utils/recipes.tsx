@@ -1,6 +1,7 @@
-import { apiBaseUrl } from './api';
+import { apiBaseUrl } from 'utils/api';
+import { type RecipeCard } from 'types/recipes';
 
-export const getRecipesList = async () => {
+export const getRecipesList = async (): Promise<RecipeCard[]> => {
   const response = await fetch(`${apiBaseUrl}/recipes`);
   const data = await response.json();
 

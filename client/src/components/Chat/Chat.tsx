@@ -1,6 +1,6 @@
 import { HiChatAlt2 } from 'react-icons/hi';
-import MessageInput from './MessageInput/MessageInput';
-import MessageList from './MessageList/MessageList';
+import MessageInput from 'components/Chat/MessageInput/MessageInput';
+import MessageList from 'components/Chat/MessageList/MessageList';
 
 function Chat() {
   return (
