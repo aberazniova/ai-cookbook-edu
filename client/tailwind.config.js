@@ -10,5 +10,8 @@ module.exports = {
   theme: {
     extend: {},
   },
-  plugins: [flowbiteReact],
+  plugins: [
+    require('@tailwindcss/typography'),
+    flowbiteReact,
+  ],
 }

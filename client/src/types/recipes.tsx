@@ -3,3 +3,15 @@ export type RecipeCard = {
   title: string;
   imageUrl?: string;
 };
+
+export type Recipe = {
+  id: number;
+  title: string;
+  imageUrl?: string;
+  instructions: string;
+  ingredients: Ingredient[];
+};
+
+type Ingredient = {
+  name: string;
+};
