@@ -40,7 +40,7 @@ function RecipeDetails() {
       {loading ? (
         <LoadingSpinner />
       ) : (
-        <>
+        <div className="flex flex-col justify-start h-full">
           {recipe.imageUrl && (
             <img
               src={recipe.imageUrl}
@@ -75,7 +75,7 @@ function RecipeDetails() {
               </ReactMarkdown>
             </div>
           </div>
-        </>
+        </div>
       )}
     </Card>
   );
