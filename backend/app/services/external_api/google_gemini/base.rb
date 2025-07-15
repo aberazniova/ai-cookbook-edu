@@ -5,7 +5,9 @@ module ExternalApi
         @connection = Faraday.new(
           url: api_url,
           headers: headers,
-        )
+        ) do |faraday|
+          faraday.response :raise_error
+        end
       end
 
       private
