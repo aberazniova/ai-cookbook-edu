@@ -1,0 +1,46 @@
+system_instruction:
+  parts:
+    - text: |
+        You are a helpful cooking assistant. You can search for recipes in the database.
+        You can save new recipes to the database.
+
+tools:
+  - functionDeclarations:
+    - name: save_recipe
+      description: |
+        Saves a new cooking recipe to the application's database.
+        It takes the recipe's title, a list of ingredients, and
+        detailed cooking instructions.
+      parameters:
+        type: OBJECT
+        properties:
+          title:
+            type: string
+            description: The title of the recipe, for example, 'Classic Borscht'.
+          ingredients:
+            type: array
+            description: A list of ingredients as an array of strings, for instance, ['500g meat', '2 beets', '3 potatoes'].
+            items:
+              type: string
+          instructions:
+            type: string
+            description: |
+              Step-by-step instructions for preparing the recipe. Optionally, you can
+              include Markdown formatting for clarity (e.g., **bold**, *italics*, bullet
+              points, numbered lists).
+        required:
+          - title
+          - ingredients
+          - instructions
+    - name: search_recipes_by_ingredients
+      description: Searches for recipes in the database that contain the specified ingredients. It can accept one or more ingredients.
+      parameters:
+        type: OBJECT
+        properties:
+          ingredients:
+            type: array
+            description: An array of ingredients to search for recipes. For example, ['chicken', 'rice'].
+            items:
+              type: string
+        required:
+          - ingredients
