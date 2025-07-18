@@ -11,6 +11,10 @@ tools:
         Saves a new cooking recipe to the application's database.
         It takes the recipe's title, a list of ingredients, and
         detailed cooking instructions.
+        When saving a recipe, format the instructions using Markdown, so that they are
+        structured, easy to understand and highlight the most important information, unless
+        the user explicitly asks for no formatting. Use emojis when appropriate to make
+        the instructions more engaging, unless the user explicitly asks for no emojis.
       parameters:
         type: OBJECT
         properties:
