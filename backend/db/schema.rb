@@ -10,7 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_15_200901) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_19_215220) do
+  create_table "conversation_turns", charset: "utf8mb4", force: :cascade do |t|
+    t.bigint "conversation_id", null: false
+    t.integer "role", null: false
+    t.text "text_content"
+    t.json "payload", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["conversation_id"], name: "index_conversation_turns_on_conversation_id"
+  end
+
+  create_table "conversations", charset: "utf8mb4", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "ingredients", charset: "utf8mb4", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -26,5 +41,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_15_200901) do
     t.text "instructions", null: false
   end
 
+  add_foreign_key "conversation_turns", "conversations"
   add_foreign_key "ingredients", "recipes"
 end

@@ -1,22 +1,16 @@
 module ExternalApi
   module GoogleGemini
     class Client < Base
-      def generate_content(prompt)
-        post("", build_payload(prompt))
+      def generate_content(conversation_contents)
+        post("", build_payload(conversation_contents))
       end
 
       private
 
-      def build_payload(prompt)
+      def build_payload(conversation_contents)
         {
           **gemini_config,
-          contents: [
-            {
-              parts: [
-                { text: prompt }
-              ]
-            }
-          ]
+          contents: conversation_contents
         }
       end
 

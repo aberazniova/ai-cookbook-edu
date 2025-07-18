@@ -17,3 +17,6 @@ storage/
 
 # Ignore log files
 *.log
+
+dump.rdb
+*.pid

@@ -2,10 +2,10 @@ module Chatbot
   class GenerateResponseMessage
     include Callable
 
-    Result = Struct.new(:success, :response_message, :error)
+    Result = Struct.new(:success?, :response_message, :error)
 
-    def initialize(message:)
-      @message = message
+    def initialize(conversation_contents:)
+      @conversation_contents = conversation_contents
     end
 
     def call
@@ -17,14 +17,14 @@ module Chatbot
 
     private
 
-    attr_reader :message
+    attr_reader :conversation_contents
 
     def gemini_client
       @_gemini_client ||= ExternalApi::GoogleGemini::Client.new
     end
 
     def response_payload
-      @_response_payload = gemini_client.generate_content(message)
+      @_response_payload = gemini_client.generate_content(conversation_contents)
     end
 
     def function_call
