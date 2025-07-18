@@ -8,23 +8,6 @@ Bundler.require(*Rails.groups)
 
 module Backend
   class Application < Rails::Application
-    config.middleware.insert_before 0, Rack::Cors do
-      allowed_origin = ENV['FRONTEND_APP_ORIGIN']
-
-      if allowed_origin.present?
-        allow do
-          origins allowed_origin
-
-          resource '*',
-            headers: :any,
-            methods: [:get, :post, :put, :patch, :delete, :options, :head],
-            credentials: true
-        end
-      else
-        Rails.logger.warn "FRONTEND_APP_ORIGIN environment variable is not set. CORS might not be configured correctly."
-      end
-    end
-
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 8.0
 
