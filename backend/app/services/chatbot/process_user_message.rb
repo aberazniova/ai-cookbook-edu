@@ -4,8 +4,9 @@ module Chatbot
 
     Result = Struct.new(:success?, :response_message, :error)
 
-    def initialize(message_content:)
+    def initialize(message_content:, conversation:)
       @message_content = message_content
+      @conversation = conversation
     end
 
     def call
@@ -22,17 +23,13 @@ module Chatbot
 
     private
 
-    attr_reader :message_content
+    attr_reader :message_content, :conversation
 
     def create_conversation_turn
       ConversationTurns::CreateFromUserMessage.call(
         message_content: message_content,
         conversation: conversation
       )
-    end
-
-    def conversation
-      @_conversation ||= Conversation.last || Conversation.create! # TODO: Implement conversation retrieval based on the cookie
     end
 
     def conversation_contents

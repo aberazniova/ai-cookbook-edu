@@ -1,4 +1,4 @@
 export type Message = {
-  text: string;
-  isUserMessage: boolean;
+  textContent: string;
+  role: string;
 };

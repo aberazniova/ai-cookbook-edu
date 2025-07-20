@@ -1,8 +1,8 @@
 class Api::V1::MessagesController < ApplicationController
-  before_action :validate_user_message!
+  before_action :validate_user_message!, only: :create
 
   def create
-    result = Chatbot::ProcessUserMessage.call(message_content: user_message)
+    result = Chatbot::ProcessUserMessage.call(message_content: user_message, conversation: conversation)
 
     if result.success?
       render json: { message: result.response_message }
@@ -11,7 +11,17 @@ class Api::V1::MessagesController < ApplicationController
     end
   end
 
+  def index
+    turns = conversation.conversation_turns.text_messages.limited_for_display
+
+    render json: { messages: Resources::Messages.call(conversation_turns: turns) }
+  end
+
   private
+
+  def conversation
+    @_conversation ||= Conversation.last || Conversation.create! # TODO: Implement conversation retrieval based on the cookie
+  end
 
   def user_message
     params[:message]

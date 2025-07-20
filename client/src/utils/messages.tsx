@@ -1,4 +1,5 @@
 import { apiBaseUrl } from 'utils/api';
+import { Message } from 'types/messages';
 
 export const sendMessage = async (message: string): Promise<string> => {
   const response = await fetch(`${apiBaseUrl}/messages`, {
@@ -15,4 +16,15 @@ export const sendMessage = async (message: string): Promise<string> => {
   }
 
   return data.message;
+};
+
+export const getMessages = async (): Promise<Message[]> => {
+  const response = await fetch(`${apiBaseUrl}/messages`);
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(`Error loading messages! ${data.message || `status: ${response.status}`}`);
+  }
+
+  return data.messages;
 };

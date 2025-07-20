@@ -34,7 +34,12 @@ function RecipesList() {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
-          {recipes.map((recipe) => (
+          {recipes.length === 0 && (
+            <div className="flex items-center justify-center h-full">
+              <p className="text-gray-500">No recipes found</p>
+            </div>
+          )}
+          {recipes?.map((recipe) => (
             <RecipeCard key={recipe.id} recipe={recipe} />
           ))}
         </div>
