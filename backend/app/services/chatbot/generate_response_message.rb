@@ -4,8 +4,9 @@ module Chatbot
 
     Result = Struct.new(:success?, :response_message, :error)
 
-    def initialize(conversation_contents:)
+    def initialize(conversation_contents:, conversation:)
       @conversation_contents = conversation_contents
+      @conversation = conversation
     end
 
     def call
@@ -17,14 +18,27 @@ module Chatbot
 
     private
 
-    attr_reader :conversation_contents
+    attr_reader :conversation_contents, :conversation
 
-    def gemini_client
-      @_gemini_client ||= ExternalApi::GoogleGemini::Client.new
+    def generate_response
+      unless response_content.present?
+        raise "No response content received"
+      end
+
+      save_response_turn
+
+      if function_call.present?
+        Chatbot::ProcessFunctionCall.call(
+          function_call_name: function_call.dig("name"),
+          function_call_args: function_call.dig("args")
+        )
+      else
+        response_content.dig("text")
+      end
     end
 
-    def response_payload
-      @_response_payload = gemini_client.generate_content(conversation_contents)
+    def api_response
+      @_api_response ||= ExternalApi::GoogleGemini.generate_content(conversation_contents)
     end
 
     def function_call
@@ -34,26 +48,14 @@ module Chatbot
     end
 
     def response_content
-      @_response_content ||= response_payload.dig("candidates", 0, "content", "parts", 0)
+      @_response_content ||= api_response.dig("candidates", 0, "content", "parts", 0)
     end
 
-    def generate_response
-      if function_call.present?
-        process_function_call
-      else
-        response_content.dig("text")
-      end
-    end
-
-    def process_function_call
-      function_call_name = function_call.dig("name")
-
-      case function_call_name
-      when "save_recipe"
-        puts "Saving recipe with args: #{function_call.dig("args")}" # TODO: Implement real function calling
-      else
-        raise "Function call not supported: #{function_call_name}"
-      end
+    def save_response_turn
+      ConversationTurns::CreateFromGeminiApiResponse.call(
+        api_response: api_response,
+        conversation: conversation
+      )
     end
   end
 end

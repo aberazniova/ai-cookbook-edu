@@ -11,7 +11,7 @@ module Chatbot
     def call
       create_conversation_turn
 
-      result = Chatbot::GenerateResponseMessage.call(conversation_contents: conversation_contents)
+      result = Chatbot::GenerateResponseMessage.call(conversation_contents: conversation_contents, conversation: conversation)
 
       if result.success?
         Result.new(true, result.response_message, nil)
@@ -25,9 +25,8 @@ module Chatbot
     attr_reader :message_content
 
     def create_conversation_turn
-      ConversationTurns::Create.call(
+      ConversationTurns::CreateFromUserMessage.call(
         message_content: message_content,
-        role: :user,
         conversation: conversation
       )
     end
