@@ -1,3 +1,4 @@
+import ReactMarkdown from 'react-markdown';
 import { type Message as MessageType } from 'types/messages';
 
 function Message({ message }: { message: MessageType }) {
@@ -13,7 +14,7 @@ function Message({ message }: { message: MessageType }) {
     <div className={`mb-4 flex ${position}`}>
       <div className={`${color} ${textColor} p-3 lg:p-4 rounded-xl max-w-[85%] text-left shadow-sm`}>
         <p className="text-sm lg:text-base">
-          {textContent}
+          <ReactMarkdown>{textContent}</ReactMarkdown>
         </p>
       </div>
     </div>
