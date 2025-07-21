@@ -1,12 +1,11 @@
 system_instruction:
   parts:
     - text: |
-        You are a helpful cooking assistant. You can search for recipes in the database.
-        You can save new recipes to the database.
+        You are a helpful cooking assistant. You can save new recipes to the database.
 
 tools:
   - functionDeclarations:
-    - name: save_recipe
+    - name: create_recipe
       description: |
         Saves a new cooking recipe to the application's database.
         It takes the recipe's title, a list of ingredients, and

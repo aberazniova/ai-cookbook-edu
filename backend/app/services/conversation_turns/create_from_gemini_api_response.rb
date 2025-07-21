@@ -25,11 +25,11 @@ module ConversationTurns
     end
 
     def role
-      responded_with_function_call? ? :function : :model
+      :model
     end
 
     def responded_with_function_call?
-      @_responded_with_function_call ||= api_response.dig("candidates", 0, "content", "parts", 0, "functionCall").present?
+      api_response.dig("candidates", 0, "content", "parts", 0, "functionCall").present?
     end
 
     def turn_payload

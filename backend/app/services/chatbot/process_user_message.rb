@@ -12,13 +12,12 @@ module Chatbot
     def call
       create_conversation_turn
 
-      result = Chatbot::GenerateResponseMessage.call(conversation_contents: conversation_contents, conversation: conversation)
+      gemini_response = Chatbot::GenerateResponse.call(conversation: conversation)
 
-      if result.success?
-        Result.new(true, result.response_message, nil)
-      else
-        Result.new(false, nil, result.error)
-      end
+      Result.new(true, gemini_response, nil)
+    rescue StandardError => e
+      Rails.logger.error("Error generating chatbot response: #{e.message}")
+      Result.new(false, nil, e.message)
     end
 
     private
@@ -30,10 +29,6 @@ module Chatbot
         message_content: message_content,
         conversation: conversation
       )
-    end
-
-    def conversation_contents
-      Chatbot::BuildPayload::ConversationHistory.call(conversation: conversation.reload)
     end
   end
 end

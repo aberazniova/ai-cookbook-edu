@@ -25,11 +25,10 @@ class ConversationTurn < ApplicationRecord
 
   enum :role, {
     user: 0,
-    model: 1,
-    function: 2
+    model: 1
   }, prefix: true
 
-  scope :text_messages, -> { where.not(role: :function) }
+  scope :text_messages, -> { where.not(text_content: nil) }
 
   scope :limited_for_display, -> {
     order(created_at: :asc)

@@ -1,25 +1,23 @@
 module Chatbot
   module BuildPayload
-    class SingleMessage
+    class SingleTurn
       include Callable
 
-      def initialize(message:, role:)
-        @message = message
+      def initialize(role:, parts:)
         @role = role
+        @parts = parts
       end
 
       def call
         {
           "role": role,
-          "parts": [
-            { "text": message }
-          ]
+          "parts": parts
         }
       end
 
       private
 
-      attr_reader :message, :role
+      attr_reader :role, :parts
     end
   end
 end

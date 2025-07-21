@@ -11,7 +11,7 @@ module ConversationTurns
       ConversationTurns::Create.call(
         role: role,
         message_content: message_content,
-        payload: Chatbot::BuildPayload::SingleMessage.call(message: message_content, role: role.to_s),
+        payload: Chatbot::BuildPayload::SingleTurn.call(role: role.to_s, parts: [{ text: message_content }]),
         conversation: conversation
       )
     end

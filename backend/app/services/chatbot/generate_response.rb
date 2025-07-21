@@ -1,26 +1,12 @@
 module Chatbot
-  class GenerateResponseMessage
+  class GenerateResponse
     include Callable
 
-    Result = Struct.new(:success?, :response_message, :error)
-
-    def initialize(conversation_contents:, conversation:)
-      @conversation_contents = conversation_contents
+    def initialize(conversation:)
       @conversation = conversation
     end
 
     def call
-      Result.new(true, generate_response, nil)
-    rescue StandardError => e
-      Rails.logger.error("Error generating chatbot response: #{e.message}")
-      Result.new(false, nil, e.message)
-    end
-
-    private
-
-    attr_reader :conversation_contents, :conversation
-
-    def generate_response
       unless response_content.present?
         raise "No response content received"
       end
@@ -30,12 +16,17 @@ module Chatbot
       if function_call.present?
         Chatbot::ProcessFunctionCall.call(
           function_call_name: function_call.dig("name"),
-          function_call_args: function_call.dig("args")
+          function_call_args: function_call.dig("args"),
+          conversation: conversation
         )
       else
         response_content.dig("text")
       end
     end
+
+    private
+
+    attr_reader :conversation
 
     def api_response
       @_api_response ||= ExternalApi::GoogleGemini.generate_content(conversation_contents)
@@ -56,6 +47,10 @@ module Chatbot
         api_response: api_response,
         conversation: conversation
       )
+    end
+
+    def conversation_contents
+      Chatbot::BuildPayload::ConversationHistory.call(conversation: conversation.reload)
     end
   end
 end
