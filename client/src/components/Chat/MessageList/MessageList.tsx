@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 
 import Message from 'components/Chat/MessageList/Message/Message';
-import { type Message as MessageType } from 'types/messages';
 import { getMessages } from 'utils/messages';
 import LoadingSpinner from 'components/Common/LoadingSpinner/LoadingSpinner';
+import { useMessagesStore } from 'stores/messagesStore';
 
 function MessageList() {
-  const [messages, setMessages] = useState<MessageType[]>([]);
+  const messages = useMessagesStore((state) => state.messages);
+  const setMessages = useMessagesStore((state) => state.setMessages);
+
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {

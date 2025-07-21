@@ -3,15 +3,28 @@ import { HiPaperAirplane } from 'react-icons/hi';
 import { useState } from 'react';
 
 import { sendMessage } from 'utils/messages';
+import { useMessagesStore } from 'stores/messagesStore';
 
 function MessageInput() {
   const [message, setMessage] = useState('');
 
+  const addMessage = useMessagesStore((state) => state.addMessage);
+
   const handleSendMessage = async () => {
     if (message.trim() === '') return;
 
+    setMessage('');
+    addMessage({
+      textContent: message,
+      role: 'user',
+    });
+
     const response = await sendMessage(message);
-    console.log('response', response);
+
+    addMessage({
+      textContent: response,
+      role: 'model',
+    });
   };
 
   return (
