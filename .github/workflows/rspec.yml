@@ -1,0 +1,57 @@
+name: Backend Tests CI
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: ai_cookbook_test
+          MYSQL_USER: runner
+          MYSQL_PASSWORD: password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "mysqladmin ping -uroot -p$MYSQL_ROOT_PASSWORD"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4.4'
+
+      - name: Set up database environment variables
+        run: |
+          echo "RAILS_ENV=test" >> $GITHUB_ENV
+          echo "DATABASE_URL=mysql2://runner:password@127.0.0.1:3306/ai_cookbook_test" >> $GITHUB_ENV
+        working-directory: ./backend
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: bundle install
+
+      - name: Set up database
+        working-directory: ./backend
+        run: |
+          bundle exec rails db:drop || true
+          bundle exec rails db:create
+          bundle exec rails db:schema:load
+
+      - name: Run RSpec tests
+        working-directory: ./backend
+        run: bundle exec rspec
