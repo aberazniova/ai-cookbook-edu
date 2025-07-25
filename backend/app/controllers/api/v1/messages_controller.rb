@@ -30,6 +30,6 @@ class Api::V1::MessagesController < ApplicationController
   def validate_user_message!
     return if user_message.present?
 
-    render json: { message: "Message must be present." }, status: :unprocessable_entity
+    render json: { message: "Message must be present." }, status: :bad_request
   end
 end
