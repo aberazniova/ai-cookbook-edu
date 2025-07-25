@@ -13,9 +13,9 @@ function Message({ message }: { message: MessageType }) {
   return (
     <div className={`mb-4 flex ${position}`}>
       <div className={`${color} ${textColor} p-3 lg:p-4 rounded-xl max-w-[85%] text-left shadow-sm`}>
-        <p className="text-sm lg:text-base">
+        <div className="text-sm lg:text-base">
           <ReactMarkdown>{textContent}</ReactMarkdown>
-        </p>
+        </div>
       </div>
     </div>
   );

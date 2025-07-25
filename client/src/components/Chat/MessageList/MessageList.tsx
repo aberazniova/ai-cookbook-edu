@@ -26,7 +26,7 @@ function MessageList() {
     };
 
     fetchMessages();
-  }, []);
+  }, [setMessages]);
 
   return (
     <div className="flex-1 p-5 lg:p-6 overflow-y-auto custom-scrollbar">

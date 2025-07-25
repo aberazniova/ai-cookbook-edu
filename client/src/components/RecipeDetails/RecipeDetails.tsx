@@ -14,22 +14,22 @@ function RecipeDetails() {
   const [recipe, setRecipe] = useState<Recipe>();
   const [loading, setLoading] = useState(true);
 
-  const fetchRecipe = async () => {
-    try {
-      setLoading(true);
-      const recipe = await getRecipe(parseInt(id, 10));
-
-      setRecipe(recipe);
-    } catch (err) {
-      console.error('Error fetching recipe:', err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchRecipe = async () => {
+      try {
+        setLoading(true);
+        const recipe = await getRecipe(parseInt(id, 10));
+
+        setRecipe(recipe);
+      } catch (err) {
+        console.error('Error fetching recipe:', err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchRecipe();
-  }, []);
+  }, [id]);
 
   return (
     <Card
