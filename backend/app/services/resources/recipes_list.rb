@@ -18,7 +18,7 @@ class Resources::RecipesList
   def recipe_data(recipe)
     {
       id: recipe.id,
-      title: recipe.title,
+      title: recipe.title
     }
   end
 end

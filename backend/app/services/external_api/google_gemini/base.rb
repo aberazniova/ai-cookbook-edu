@@ -24,7 +24,7 @@ module ExternalApi
 
       def headers
         {
-          'x-goog-api-key': api_key,
+          'x-goog-api-key': api_key
         }
       end
 

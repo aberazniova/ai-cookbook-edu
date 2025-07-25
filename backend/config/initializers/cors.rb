@@ -6,13 +6,13 @@
 # Read more: https://github.com/cyu/rack-cors
 
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
-  allowed_origin = ENV['FRONTEND_APP_ORIGIN']
+  allowed_origin = ENV["FRONTEND_APP_ORIGIN"]
 
   if allowed_origin.present?
     allow do
       origins allowed_origin
 
-      resource '*',
+      resource "*",
         headers: :any,
         methods: [:get, :post, :put, :patch, :delete, :options, :head],
         credentials: true

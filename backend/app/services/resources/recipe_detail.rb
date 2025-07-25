@@ -10,7 +10,7 @@ class Resources::RecipeDetail
       id: recipe.id,
       title: recipe.title,
       instructions: recipe.instructions,
-      ingredients: ingredients,
+      ingredients: ingredients
     }
   end
 
@@ -24,7 +24,7 @@ class Resources::RecipeDetail
 
   def ingredient_data(ingredient)
     {
-      name: ingredient.name,
+      name: ingredient.name
     }
   end
 end
