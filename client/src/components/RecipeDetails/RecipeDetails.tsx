@@ -8,11 +8,14 @@ import LoadingSpinner from 'components/Common/LoadingSpinner/LoadingSpinner';
 
 import { getRecipe } from 'utils/recipes';
 import { type Recipe } from 'types/recipes';
+import { useAlertStore } from 'stores/alertStore';
 
 function RecipeDetails() {
   const { id } = useParams<{ id: string }>();
   const [recipe, setRecipe] = useState<Recipe>();
   const [loading, setLoading] = useState(true);
+
+  const addAlert = useAlertStore((state) => state.addAlert);
 
   useEffect(() => {
     const fetchRecipe = async () => {
@@ -21,8 +24,11 @@ function RecipeDetails() {
         const recipe = await getRecipe(parseInt(id, 10));
 
         setRecipe(recipe);
-      } catch (err) {
-        // display error in the UI
+      } catch (error) {
+        addAlert({
+          type: 'failure',
+          message: error.message || 'Failed to load recipe.',
+        });
       } finally {
         setLoading(false);
       }

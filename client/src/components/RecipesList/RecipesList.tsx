@@ -4,10 +4,13 @@ import RecipeCard from 'components/RecipesList/RecipeCard/RecipeCard';
 import LoadingSpinner from 'components/Common/LoadingSpinner/LoadingSpinner';
 import { getRecipesList } from 'utils/recipes';
 import { type RecipeCard as RecipeCardType } from 'types/recipes';
+import { useAlertStore } from 'stores/alertStore';
 
 function RecipesList() {
   const [recipes, setRecipes] = useState<RecipeCardType[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const addAlert = useAlertStore((state) => state.addAlert);
 
   const fetchRecipes = async () => {
     try {
@@ -15,8 +18,11 @@ function RecipesList() {
       const recipes = await getRecipesList();
 
       setRecipes(recipes);
-    } catch (err) {
-      // display error in the UI
+    } catch (error) {
+      addAlert({
+        type: 'failure',
+        message: error.message || 'Failed to load recipes.',
+      });
     } finally {
       setLoading(false);
     }

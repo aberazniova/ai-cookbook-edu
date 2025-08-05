@@ -4,10 +4,12 @@ import Message from 'components/Chat/MessageList/Message/Message';
 import { getMessages } from 'utils/messages';
 import LoadingSpinner from 'components/Common/LoadingSpinner/LoadingSpinner';
 import { useMessagesStore } from 'stores/messagesStore';
+import { useAlertStore } from 'stores/alertStore';
 
 function MessageList() {
   const messages = useMessagesStore((state) => state.messages);
   const setMessages = useMessagesStore((state) => state.setMessages);
+  const addAlert = useAlertStore((state) => state.addAlert);
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -19,14 +21,17 @@ function MessageList() {
         const messagesHistory = await getMessages();
         setMessages(messagesHistory);
       } catch (error) {
-        // display error in the UI
+        addAlert({
+          type: 'failure',
+          message: error.message || 'Failed to load message history.',
+        });
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchMessages();
-  }, [setMessages]);
+  }, [setMessages, addAlert]);
 
   return (
     <div className="flex-1 p-5 lg:p-6 overflow-y-auto custom-scrollbar">

@@ -4,27 +4,41 @@ import { useState } from 'react';
 
 import { sendMessage } from 'utils/messages';
 import { useMessagesStore } from 'stores/messagesStore';
+import { useAlertStore } from 'stores/alertStore';
 
 function MessageInput() {
   const [message, setMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const addMessage = useMessagesStore((state) => state.addMessage);
+  const addAlert = useAlertStore((state) => state.addAlert);
 
   const handleSendMessage = async () => {
-    if (message.trim() === '') return;
+    if (message.trim() === '' || isLoading) return;
 
-    setMessage('');
     addMessage({
       textContent: message,
       role: 'user',
     });
 
-    const response = await sendMessage(message);
+    setMessage('');
+    setIsLoading(true);
 
-    addMessage({
-      textContent: response,
-      role: 'model',
-    });
+    try {
+      const response = await sendMessage(message);
+
+      addMessage({
+        textContent: response,
+        role: 'model',
+      });
+    } catch (error) {
+      addAlert({
+        type: 'failure',
+        message: error.message || 'An unexpected error occurred while processing your message.',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -37,14 +51,16 @@ function MessageInput() {
 focus:ring-emerald-600 focus:border-emerald-600 placeholder-gray-400 dark:placeholder-gray-400 resize-none"
         value={message}
         onChange={(e) => setMessage(e.target.value)}
+        disabled={isLoading}
       />
       <Button
         className="mt-4 w-full bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white font-semibold
 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:ring-opacity-50
-rounded-xl transition-all duration-200 shadow-md hover:shadow-lg py-3"
+rounded-xl transition-all duration-200 shadow-md hover:shadow-lg py-3 disabled:opacity-50 disabled:cursor-not-allowed"
         onClick={handleSendMessage}
+        disabled={isLoading || message.trim() === ''}
       >
-        Send <HiPaperAirplane className="ml-2 h-5 w-5 transform rotate-90" />
+        {isLoading ? 'Sending...' : 'Send'} <HiPaperAirplane className="ml-2 h-5 w-5 transform rotate-90" />
       </Button>
     </div>
   );
