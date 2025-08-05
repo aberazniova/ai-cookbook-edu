@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+build/
+dist/
+
+# Config files
+*.config.js
+*.config.ts
+tailwind.config.js
+
+# Flowbite React internal files (config, generated data, process files)
+.flowbite-react/
+
+# Logs
+*.log
+
+# Environment files
+.env*

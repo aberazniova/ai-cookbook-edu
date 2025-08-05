@@ -19,7 +19,7 @@ function MessageList() {
         const messagesHistory = await getMessages();
         setMessages(messagesHistory);
       } catch (error) {
-        console.error(error);
+        // display error in the UI
       } finally {
         setIsLoading(false);
       }

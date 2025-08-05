@@ -16,7 +16,7 @@ function RecipesList() {
 
       setRecipes(recipes);
     } catch (err) {
-      console.error('Error fetching recipes:', err.message);
+      // display error in the UI
     } finally {
       setLoading(false);
     }

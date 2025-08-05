@@ -22,7 +22,7 @@ function RecipeDetails() {
 
         setRecipe(recipe);
       } catch (err) {
-        console.error('Error fetching recipe:', err.message);
+        // display error in the UI
       } finally {
         setLoading(false);
       }
