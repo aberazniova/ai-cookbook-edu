@@ -5,6 +5,8 @@ import Chat from 'components/Chat/Chat';
 import Router from 'Router';
 import GlobalAlerts from 'components/Common/Alert/GlobalAlerts';
 
+type BannedType = Object;
+
 function App() {
   return (
     <div className="min-h-screen bg-stone-50 dark:bg-neutral-950 font-sans antialiased text-gray-800 dark:text-gray-100">
