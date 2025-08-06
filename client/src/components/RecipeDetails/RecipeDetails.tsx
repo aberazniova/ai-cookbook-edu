@@ -35,7 +35,7 @@ function RecipeDetails() {
     };
 
     fetchRecipe();
-  }, [id]);
+  }, [id, addAlert]);
 
   return (
     <Card

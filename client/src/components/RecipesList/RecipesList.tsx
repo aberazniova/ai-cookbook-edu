@@ -12,25 +12,25 @@ function RecipesList() {
 
   const addAlert = useAlertStore((state) => state.addAlert);
 
-  const fetchRecipes = async () => {
-    try {
-      setLoading(true);
-      const recipes = await getRecipesList();
-
-      setRecipes(recipes);
-    } catch (error) {
-      addAlert({
-        type: 'failure',
-        message: error.message || 'Failed to load recipes.',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchRecipes = async () => {
+      try {
+        setLoading(true);
+        const recipes = await getRecipesList();
+
+        setRecipes(recipes);
+      } catch (error) {
+        addAlert({
+          type: 'failure',
+          message: error.message || 'Failed to load recipes.',
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchRecipes();
-  }, []);
+  }, [addAlert]);
 
   return (
     <>

@@ -25,18 +25,18 @@ module.exports = {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'warn',
     '@typescript-eslint/no-non-null-assertion': 'warn',
-    
+
     // React specific rules
     'react/react-in-jsx-scope': 'off', // Not needed with React 17+
     'react/prop-types': 'off', // We're using TypeScript for prop validation
     'react/display-name': 'off',
     'react/jsx-uses-react': 'off',
     'react/jsx-uses-vars': 'error',
-    
+
     // React Hooks rules
     'react-hooks/rules-of-hooks': 'error',
-    'react-hooks/exhaustive-deps': 'warn',
-    
+    'react-hooks/exhaustive-deps': 'error',
+
     // General rules
     'no-console': 'warn',
     'no-debugger': 'error',
@@ -60,4 +60,4 @@ module.exports = {
     '*.config.js',
     '*.config.ts',
   ],
-}; 
+};
