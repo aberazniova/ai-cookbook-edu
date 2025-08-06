@@ -1,4 +1,5 @@
-name: Backend Tests CI
+name: Backend Tests
+description: Run backend tests
 
 on:
   push:

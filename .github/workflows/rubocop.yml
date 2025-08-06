@@ -1,4 +1,5 @@
-name: RuboCop CI
+name: RuboCop
+description: Run backend linting checks
 
 on:
   push:
