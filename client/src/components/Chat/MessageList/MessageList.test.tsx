@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import MessageList from './MessageList';
 import { waitFor } from '@testing-library/dom';
+import { vi } from 'vitest';
 
 const messagesResponse = {
   messages: [
@@ -19,7 +20,7 @@ beforeAll(() => {
       return Promise.resolve({
         ok: true,
         json: () => Promise.resolve(messagesResponse),
-      });
+      } as Response);
     }
     return Promise.reject(new Error('Unknown endpoint'));
   });

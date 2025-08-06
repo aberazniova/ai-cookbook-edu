@@ -9,6 +9,7 @@ module.exports = {
   },
   extends: [
     'eslint:recommended',
+    'plugin:vitest/recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:react/recommended',
     'plugin:react-hooks/recommended',
@@ -52,7 +53,6 @@ module.exports = {
     browser: true,
     es6: true,
     node: true,
-    jest: true,
   },
   ignorePatterns: [
     'build/',
