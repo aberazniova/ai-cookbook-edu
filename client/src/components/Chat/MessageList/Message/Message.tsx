@@ -11,7 +11,7 @@ function Message({ message }: { message: MessageType }) {
   const position = isUserMessage ? 'justify-end' : 'justify-start';
 
   return (
-    <div className={`mb-4 flex ${position}`}>
+    <div className={`mb-4 flex ${position}`} data-testid='message'>
       <div className={`${color} ${textColor} p-3 lg:p-4 rounded-xl max-w-[85%] text-left shadow-sm`}>
         <div className="text-sm lg:text-base">
           <ReactMarkdown>{textContent}</ReactMarkdown>
