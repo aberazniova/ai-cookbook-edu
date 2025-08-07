@@ -16,16 +16,6 @@ RSpec.describe Chatbot::ProcessFunctionCall do
       allow(Chatbot::GenerateResponse).to receive(:call).and_return(gemini_response)
     end
 
-    it "calls the corresponding function call service with the arguments passed" do
-      call
-
-      expect(Chatbot::FunctionCalls::CreateRecipe).to have_received(:call).with(
-        title: "Test Recipe",
-        ingredients: ["Ingredient 1"],
-        instructions: "Test instructions"
-      )
-    end
-
     it "creates a conversation turn with the function response" do
       expected_function_response = {
         name: function_call_name,
@@ -51,6 +41,33 @@ RSpec.describe Chatbot::ProcessFunctionCall do
 
     it "returns the gemini response" do
       expect(call).to eq(gemini_response)
+    end
+
+    [
+      {
+        name: "create_recipe",
+        args: { "title" => "Test Recipe", "ingredients" => ["Ingredient 1"], "instructions" => "Test instructions" },
+        service: Chatbot::FunctionCalls::CreateRecipe,
+      },
+      {
+        name: "get_recipe",
+        args: { "id" => 3 },
+        service: Chatbot::FunctionCalls::GetRecipe,
+      }
+    ].each do |function_call|
+      context "when function call name is #{function_call[:name]}" do
+        let(:function_call_name) { function_call[:name] }
+        let(:function_call_args) { function_call[:args] }
+
+        before do
+          allow(function_call[:service]).to receive(:call).and_return(function_result)
+        end
+
+        it "calls the #{function_call[:name]} service" do
+          call
+          expect(function_call[:service]).to have_received(:call).with(function_call[:args].transform_keys(&:to_sym))
+        end
+      end
     end
 
     context "when function call name is not supported" do

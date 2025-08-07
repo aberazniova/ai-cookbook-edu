@@ -68,8 +68,9 @@ end
 ```
 
 ## Mocking & Dependencies
-- Test real behavior when possible, mock external services and dependencies
 - Don't over-use mocks
+- Test real behavior when possible, mock external services and dependencies
+- Do not mock ActiveRecord methods, unless absolutely necessary, create real instances instead
 
 ### Good Examples:
 ```ruby

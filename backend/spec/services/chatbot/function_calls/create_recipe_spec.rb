@@ -40,7 +40,7 @@ RSpec.describe Chatbot::FunctionCalls::CreateRecipe do
     it "returns success response with recipe data" do
       expect(call).to eq({
         "status": "success",
-        "message": "Recipe saved successfully",
+        "message": "Recipe created successfully",
         "data": {
           id: recipe.id,
           title: recipe.title,

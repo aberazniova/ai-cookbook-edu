@@ -25,6 +25,8 @@ module Chatbot
       case function_call_name
       when "create_recipe"
         Chatbot::FunctionCalls::CreateRecipe.call(**symbolized_arguments)
+      when "get_recipe"
+        Chatbot::FunctionCalls::GetRecipe.call(**symbolized_arguments)
       else
         raise "Function call not supported: #{function_call_name}"
       end
