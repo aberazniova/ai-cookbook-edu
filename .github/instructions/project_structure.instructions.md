@@ -2,16 +2,17 @@
 applyTo: '**'
 ---
 
-# Project Structure and Command Execution
+# Project Structure and Command Execution Rule
 
-- **Frontend code** is in the `client` directory.
-- **Backend code** is in the `backend` directory.
+- Project’s directory structure:
+  - The frontend code is located in the `client` directory.
+  - The backend code is located in the `backend` directory.
 
-## Command Execution
+- **Command Execution:**
+  - For any frontend command (npm, yarn, vitest, vite, react-scripts, etc.), change into the `client` directory before executing the command.
+    - Example: `cd client && npm install some-package`
+  - For any backend command (rails, bundle, rspec, etc.), change into the `backend` directory before executing the command.
+    - Example: `cd backend && bundle exec rspec`
 
-- For any frontend command (npm, yarn, vitest, vite, react-scripts, etc.), change into the `client` directory before running the command.
-  - Example: `cd client && npm install some-package`
-- For any backend command (rails, bundle, rspec, etc.), change into the `backend` directory before running the command.
-  - Example: `cd backend && bundle exec rspec`
-
-**Always ensure you are in the correct subdirectory (`client` for frontend, `backend` for backend) before running project-specific
+- **General Principle:**
+  - Always ensure the working directory is set to the appropriate subdirectory (`client` for frontend, `backend` for backend) before running any project-specific commands.
