@@ -22,14 +22,18 @@ module Chatbot
     attr_reader :function_call_name, :function_call_args, :conversation
 
     def process_based_on_function_call_name
-      case function_call_name
-      when "create_recipe"
-        Chatbot::FunctionCalls::CreateRecipe.call(**symbolized_arguments)
-      when "get_recipe"
-        Chatbot::FunctionCalls::GetRecipe.call(**symbolized_arguments)
-      else
-        raise "Function call not supported: #{function_call_name}"
+      function_class = "Chatbot::FunctionCalls::#{function_call_name.camelize}".safe_constantize
+
+      unless function_class
+        raise StandardError, "Function call not supported: #{function_call_name}"
       end
+
+      function_class.call(**symbolized_arguments)
+    rescue StandardError => e
+      {
+        "status": "error",
+        "message": e.message
+      }
     end
 
     def function_call_response(result)

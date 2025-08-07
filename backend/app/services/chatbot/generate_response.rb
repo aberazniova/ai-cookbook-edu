@@ -50,7 +50,7 @@ module Chatbot
     end
 
     def conversation_contents
-      Chatbot::BuildPayload::ConversationHistory.call(conversation: conversation.reload)
+      Chatbot::BuildPayload::ConversationHistory.call(conversation: conversation)
     end
   end
 end

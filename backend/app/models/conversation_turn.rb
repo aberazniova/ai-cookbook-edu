@@ -19,7 +19,7 @@ class ConversationTurn < ApplicationRecord
   belongs_to :conversation
 
   # This limit exists for minimizing Gemini API token usage
-  GEMINI_API_MAX_HISTORY_LENGTH = ENV.fetch("GEMINI_API_MAX_HISTORY_LENGTH", 10).to_i
+  GEMINI_API_MAX_HISTORY_LENGTH = ENV.fetch("GEMINI_API_MAX_HISTORY_LENGTH", 50).to_i
 
   MAX_MESSAGES_DISPLAY_LIMIT = ENV.fetch("MAX_MESSAGES_DISPLAY_LIMIT", 50).to_i
 

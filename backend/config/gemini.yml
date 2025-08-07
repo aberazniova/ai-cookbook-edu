@@ -43,7 +43,7 @@ tools:
           - instructions
     - name: update_recipe
       description: |
-        Updates an existing recipe in the database. When updating, make sure the list of ingredients and
+        Updates an existing recipe in the database by its ID. When updating, make sure the list of ingredients and
         ingredients mentioned in the instructions are in sync, e.g when you remove an ingredient from the list,
         be sure to also remove it from the instructions.
       parameters:
@@ -57,7 +57,9 @@ tools:
             description: The new title of the recipe.
           ingredients:
             type: array
-            description: The new list of ingredients.
+            description: |
+              The new list of ingredients. If you pass this parameter, make sure to provide the
+              full final list of ingredients.
             items:
               type: string
           instructions:

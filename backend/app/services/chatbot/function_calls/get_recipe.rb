@@ -12,11 +12,6 @@ module Chatbot
           "status": "success",
           "data": Resources::RecipeDetail.call(recipe)
         }
-      rescue StandardError => e
-        {
-          "status": "error",
-          "message": e.message
-        }
       end
 
       private

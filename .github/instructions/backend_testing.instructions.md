@@ -67,10 +67,12 @@ end
   let(:post) { build(:post) }    # Created when first used
 ```
 
+
 ## Mocking & Dependencies
 - Don't over-use mocks
 - Test real behavior when possible, mock external services and dependencies
-- Do not mock ActiveRecord methods, unless absolutely necessary, create real instances instead
+- Do not mock ActiveRecord methods (such as :create!, :update, :destroy, etc.); instead, check that the expected records are created or updated in the database.
+- Only mock ActiveRecord methods if absolutely necessary.
 
 ### Good Examples:
 ```ruby

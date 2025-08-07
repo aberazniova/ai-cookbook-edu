@@ -10,8 +10,7 @@ module Recipes
 
     def call
       recipe = Recipe.create!(title: title, instructions: instructions)
-
-      ingredients.each { |ingredient| create_ingredient(recipe, ingredient) }
+      Recipes::CreateIngredients.call(recipe: recipe, ingredients: ingredients)
 
       recipe
     end
@@ -19,9 +18,5 @@ module Recipes
     private
 
     attr_reader :title, :ingredients, :instructions
-
-    def create_ingredient(recipe, name)
-      Ingredient.create!(recipe: recipe, name: name)
-    end
   end
 end
