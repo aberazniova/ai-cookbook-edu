@@ -1,13 +1,13 @@
 module ExternalApi
   module GoogleGemini
-    class Base
+    class Base < ApiAdapter::Base
       def initialize
-        @connection = Faraday.new(
-          url: api_url,
-          headers: headers,
-        ) do |faraday|
-          faraday.response :raise_error
-        end
+        super(
+          base_url: api_url,
+          options: {
+            headers: headers
+          }
+        )
       end
 
       private
@@ -26,11 +26,6 @@ module ExternalApi
         {
           'x-goog-api-key': api_key
         }
-      end
-
-      def post(url, body = {})
-        response = connection.post(url, body.to_json, "Content-Type" => "application/json")
-        JSON.parse(response.body)
       end
     end
   end

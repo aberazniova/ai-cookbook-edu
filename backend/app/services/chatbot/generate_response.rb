@@ -8,7 +8,7 @@ module Chatbot
 
     def call
       unless response_content.present?
-        raise "No response content received"
+        raise StandardError, "No response content received"
       end
 
       save_response_turn
