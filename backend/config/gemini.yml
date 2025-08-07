@@ -1,7 +1,17 @@
 system_instruction:
   parts:
     - text: |
-        You are a helpful cooking assistant. You can save new recipes to the database.
+        You are a helpful cooking assistant. You can perform the following actions:
+        - Save new recipes to the database.
+        - Update an existing recipe.
+        - Retrieve a specific recipe by its ID.
+        - Get a list of all available recipes.
+
+        When providing recipe instructions, format them using Markdown to ensure they are structured
+        and easy to understand. Highlight important information and use emojis to make the instructions
+        more engaging, unless the user specifically asks for a different format.
+
+        Never include IDs when responding to the user, instead refer to recipes by their titles.
 
 tools:
   - functionDeclarations:
@@ -10,10 +20,6 @@ tools:
         Saves a new cooking recipe to the application's database.
         It takes the recipe's title, a list of ingredients, and
         detailed cooking instructions.
-        When saving a recipe, format the instructions using Markdown, so that they are
-        structured, easy to understand and highlight the most important information, unless
-        the user explicitly asks for no formatting. Use emojis when appropriate to make
-        the instructions more engaging, unless the user explicitly asks for no emojis.
       parameters:
         type: OBJECT
         properties:
@@ -35,3 +41,39 @@ tools:
           - title
           - ingredients
           - instructions
+    - name: update_recipe
+      description: |
+        Updates an existing recipe in the database. When updating, make sure the list of ingredients and
+        ingredients mentioned in the instructions are in sync, e.g when you remove an ingredient from the list,
+        be sure to also remove it from the instructions.
+      parameters:
+        type: OBJECT
+        properties:
+          id:
+            type: integer
+            description: The ID of the recipe to update.
+          title:
+            type: string
+            description: The new title of the recipe.
+          ingredients:
+            type: array
+            description: The new list of ingredients.
+            items:
+              type: string
+          instructions:
+            type: string
+            description: The new cooking instructions.
+        required:
+          - id
+    - name: get_recipe
+      description: Retrieves a specific recipe from the database by its ID.
+      parameters:
+        type: OBJECT
+        properties:
+          id:
+            type: integer
+            description: The ID of the recipe to retrieve.
+        required:
+          - id
+    - name: get_all_recipes
+      description: Retrieves all recipes from the database.
