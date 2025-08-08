@@ -118,8 +118,8 @@ RSpec.describe Chatbot::GenerateResponse do
         }
       end
 
-      it "raises an error" do
-        expect { call }.to raise_error("No response content received")
+      it "returns nil" do
+        expect(call).to be_nil
       end
     end
 

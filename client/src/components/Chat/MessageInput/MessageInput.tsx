@@ -27,6 +27,10 @@ function MessageInput() {
     try {
       const response = await sendMessage(message);
 
+      if (!response) {
+        return;
+      }
+
       addMessage({
         textContent: response,
         role: 'model',
