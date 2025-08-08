@@ -67,7 +67,7 @@ function RecipeDetails() {
               </h2>
               <ul className="list-disc list-inside text-gray-700 dark:text-gray-200 text-base lg:text-lg space-y-1">
                 {recipe.ingredients.map((ingredient, index) => (
-                  <li key={index}>{ingredient.name}</li>
+                  <li key={index}>{ingredient}</li>
                 ))}
               </ul>
             </div>

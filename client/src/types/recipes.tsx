@@ -9,9 +9,5 @@ export type Recipe = {
   title: string;
   imageUrl?: string;
   instructions: string;
-  ingredients: Ingredient[];
-};
-
-type Ingredient = {
-  name: string;
+  ingredients: string[];
 };

@@ -30,7 +30,7 @@ RSpec.describe Chatbot::FunctionCalls::GetAllRecipes do
         expect(call[:data].first).to eq({
           id: recipe1.id,
           title: recipe1.title,
-          ingredients: recipe1.ingredients.map { |ingredient| { name: ingredient.name } },
+          ingredients: recipe1.ingredients.map(&:name),
           instructions: recipe1.instructions
         })
       end

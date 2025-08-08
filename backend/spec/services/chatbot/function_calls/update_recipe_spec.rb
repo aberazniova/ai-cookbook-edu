@@ -28,7 +28,7 @@ RSpec.describe Chatbot::FunctionCalls::UpdateRecipe do
     expect(result[:data]).to eq({
       id: recipe.id,
       title: new_title,
-      ingredients: new_ingredients.map { |ingredient| { name: ingredient } },
+      ingredients: new_ingredients,
       instructions: new_instructions
     })
   end

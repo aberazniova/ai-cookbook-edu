@@ -71,7 +71,7 @@ RSpec.describe Api::V1::RecipesController, type: :controller do
           "id" => recipe.id,
           "title" => recipe.title,
           "instructions" => recipe.instructions,
-          "ingredients" => recipe.ingredients.map { |ingredient| { "name" => ingredient.name } }
+          "ingredients" => recipe.ingredients.map(&:name)
         }
 
         expect(json_response).to eq(expected_payload)

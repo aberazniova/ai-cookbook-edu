@@ -12,7 +12,7 @@ RSpec.describe Chatbot::FunctionCalls::GetRecipe do
           id: recipe.id,
           title: recipe.title,
           instructions: recipe.instructions,
-          ingredients: recipe.ingredients.map { |ingredient| { name: ingredient.name } }
+          ingredients: recipe.ingredients.map(&:name)
         }
       end
 
