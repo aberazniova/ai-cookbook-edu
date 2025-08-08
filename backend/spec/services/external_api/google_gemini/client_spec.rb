@@ -22,7 +22,7 @@ RSpec.describe ExternalApi::GoogleGemini::Client do
         **gemini_config,
         contents: conversation_contents,
         generationConfig: {
-          temperature: 1.2,
+          temperature: 1.2
         }
       }
 

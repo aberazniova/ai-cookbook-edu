@@ -15,11 +15,11 @@ module ExternalApi
       attr_reader :connection
 
       def api_url
-        ENV.fetch("GOOGLE_GEMINI_API_URL")
+        ENV["GOOGLE_GEMINI_API_URL"]
       end
 
       def api_key
-        ENV.fetch("GOOGLE_GEMINI_API_KEY")
+        ENV["GOOGLE_GEMINI_API_KEY"]
       end
 
       def headers
