@@ -9,7 +9,7 @@ RSpec.describe ExternalApi::GoogleGemini::Client do
     let(:conversation_contents) { [{ role: "user", parts: [{ text: "Hello" }] }] }
     let(:faraday_connection) { instance_double(Faraday::Connection) }
     let(:faraday_response) { instance_double(Faraday::Response, body: { "candidates" => [] }.to_json) }
-    let(:gemini_config) { { "generationConfig" => { "temperature" => 0.9 }, "safetySettings" => [] } }
+    let(:gemini_config) { { "example_gemini_config" => [] } }
 
     before do
       allow(Faraday).to receive(:new).and_return(faraday_connection)
@@ -20,7 +20,10 @@ RSpec.describe ExternalApi::GoogleGemini::Client do
     it "makes a post request with the correct payload" do
       expected_payload = {
         **gemini_config,
-        contents: conversation_contents
+        contents: conversation_contents,
+        generationConfig: {
+          temperature: 1.2,
+        }
       }
 
       generate_content

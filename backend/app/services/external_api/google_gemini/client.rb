@@ -10,7 +10,10 @@ module ExternalApi
       def build_payload(conversation_contents)
         {
           **gemini_config,
-          contents: conversation_contents
+          contents: conversation_contents,
+          generationConfig: {
+            temperature: ENV.fetch("GOOGLE_GEMINI_TEMPERATURE", 1.2).to_f
+          }
         }
       end
 
