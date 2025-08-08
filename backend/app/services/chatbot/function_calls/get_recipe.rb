@@ -10,7 +10,7 @@ module Chatbot
       def call
         {
           "status": "success",
-          "data": Resources::RecipeDetail.call(recipe)
+          "data": RecipeDetailSerializer.new(recipe).as_json
         }
       end
 

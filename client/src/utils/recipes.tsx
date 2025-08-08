@@ -9,7 +9,7 @@ export const getRecipesList = async (): Promise<RecipeCard[]> => {
     throw new Error(`Error fetching recipes! ${data.message || `status: ${response.status}`}`);
   }
 
-  return data.recipes;
+  return data;
 };
 
 export const getRecipe = async (id: number): Promise<Recipe> => {

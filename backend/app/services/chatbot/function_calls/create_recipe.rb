@@ -15,7 +15,7 @@ module Chatbot
         {
           "status": "success",
           "message": "Recipe created successfully",
-          "data": Resources::RecipeDetail.call(recipe)
+          "data": RecipeDetailSerializer.new(recipe).as_json
         }
       end
 

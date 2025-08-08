@@ -7,45 +7,36 @@ RSpec.describe Chatbot::FunctionCalls::CreateRecipe do
     let(:title) { "Test Recipe" }
     let(:ingredients) { ["Ingredient 1", "Ingredient 2"] }
     let(:instructions) { "Test instructions" }
-    let(:recipe) { create(:recipe, title: title, instructions: instructions) }
 
     before do
-      allow(Recipes::CreateRecipe).to receive(:call).and_return(recipe)
-      allow(Resources::RecipeDetail).to receive(:call).with(recipe).and_return(
-        {
-          id: recipe.id,
-          title: recipe.title,
-          instructions: recipe.instructions,
-          ingredients: []
-        }
-      )
+      allow(Recipes::CreateRecipe).to receive(:call).and_call_original
     end
 
     it "calls Recipes::CreateRecipe with correct parameters" do
-      call
-
-      expect(Recipes::CreateRecipe).to have_received(:call).with(
+      expect(Recipes::CreateRecipe).to receive(:call).with(
         title: title,
         ingredients: ingredients,
         instructions: instructions
       )
+      call
     end
 
-    it "calls Resources::RecipeDetail with the created recipe" do
-      call
-
-      expect(Resources::RecipeDetail).to have_received(:call).with(recipe)
+    it "creates a recipe" do
+      expect { call }.to change { Recipe.count }.by(1)
     end
 
     it "returns success response with recipe data" do
-      expect(call).to eq({
+      result = call
+      recipe = Recipe.last
+
+      expect(result).to eq({
         "status": "success",
         "message": "Recipe created successfully",
         "data": {
           id: recipe.id,
           title: recipe.title,
           instructions: recipe.instructions,
-          ingredients: []
+          ingredients: recipe.ingredients.map { |ingredient| { name: ingredient.name } }
         }
       })
     end

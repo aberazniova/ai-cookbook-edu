@@ -13,7 +13,7 @@ RSpec.describe Api::V1::RecipesController, type: :controller do
       it "returns an empty recipes array" do
         do_request
         json_response = JSON.parse(response.body)
-        expect(json_response["recipes"]).to eq([])
+        expect(json_response).to eq([])
       end
     end
 
@@ -32,7 +32,7 @@ RSpec.describe Api::V1::RecipesController, type: :controller do
         json_response = JSON.parse(response.body)
 
         expected_order = [recipe3, recipe2, recipe1]
-        actual_order = json_response["recipes"].map { |recipe| recipe["title"] }
+        actual_order = json_response.map { |recipe| recipe["title"] }
 
         expect(actual_order).to eq(expected_order.map(&:title))
       end
@@ -46,7 +46,7 @@ RSpec.describe Api::V1::RecipesController, type: :controller do
           "title" => recipe3.title
         }
 
-        recipe_data = json_response["recipes"].first
+        recipe_data = json_response.first
         expect(recipe_data).to eq(expected_payload)
       end
     end

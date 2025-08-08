@@ -5,24 +5,15 @@ RSpec.describe Chatbot::FunctionCalls::GetRecipe do
     subject(:call) { described_class.call(id: recipe_id) }
 
     context "when the recipe exists" do
-      let(:recipe) { create(:recipe) }
+      let(:recipe) { create(:recipe, :with_ingredients) }
       let(:recipe_id) { recipe.id }
       let(:recipe_detail) do
         {
           id: recipe.id,
           title: recipe.title,
           instructions: recipe.instructions,
-          ingredients: recipe.ingredients.map(&:name)
+          ingredients: recipe.ingredients.map { |ingredient| { name: ingredient.name } }
         }
-      end
-
-      before do
-        allow(Resources::RecipeDetail).to receive(:call).with(recipe).and_return(recipe_detail)
-      end
-
-      it "calls Resources::RecipeDetail with the found recipe" do
-        call
-        expect(Resources::RecipeDetail).to have_received(:call).with(recipe)
       end
 
       it "returns a success status and the recipe data" do
