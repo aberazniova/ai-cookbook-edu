@@ -12,10 +12,10 @@ RSpec.describe Api::V1::MessagesController, type: :controller do
         expect(response).to have_http_status(:ok)
       end
 
-      it "returns an empty messages array" do
+      it "returns an empty array" do
         do_request
         json_response = JSON.parse(response.body)
-        expect(json_response["messages"]).to eq([])
+        expect(json_response).to eq([])
       end
     end
 
@@ -32,7 +32,9 @@ RSpec.describe Api::V1::MessagesController, type: :controller do
       it "returns the messages with the text content and roles" do
         do_request
         json_response = JSON.parse(response.body)
-        expect(json_response["messages"]).to eq(conversation.conversation_turns.map { |turn| { "textContent" => turn.text_content, "role" => turn.role.to_s } })
+        expect(json_response).to eq(
+          conversation.conversation_turns.map { |turn| { "text_content" => turn.text_content, "role" => turn.role.to_s } }
+        )
       end
     end
 
@@ -46,7 +48,7 @@ RSpec.describe Api::V1::MessagesController, type: :controller do
       it "returns only the last MAX_MESSAGES_DISPLAY_LIMIT messages" do
         do_request
         json_response = JSON.parse(response.body)
-        expect(json_response["messages"].length).to eq(max_display_limit)
+        expect(json_response.length).to eq(max_display_limit)
       end
 
       it "returns the most recent messages when limit is exceeded" do
@@ -55,7 +57,7 @@ RSpec.describe Api::V1::MessagesController, type: :controller do
 
         expected_turns = conversation.conversation_turns.text_messages.limited_for_display
 
-        expect(json_response["messages"].map { |msg| msg["textContent"] }).to eq(
+        expect(json_response.map { |msg| msg["text_content"] }).to eq(
           expected_turns.map(&:text_content)
         )
       end
@@ -71,7 +73,7 @@ RSpec.describe Api::V1::MessagesController, type: :controller do
         json_response = JSON.parse(response.body)
 
         expected_order = [first_message, second_message, third_message]
-        actual_order = json_response["messages"].map { |msg| msg["textContent"] }
+        actual_order = json_response.map { |msg| msg["text_content"] }
 
         expect(actual_order).to eq(expected_order.map(&:text_content))
       end
@@ -85,8 +87,8 @@ RSpec.describe Api::V1::MessagesController, type: :controller do
         do_request
         json_response = JSON.parse(response.body)
 
-        expect(json_response["messages"].length).to eq(1)
-        expect(json_response["messages"].first["textContent"]).to eq("Hello")
+        expect(json_response.length).to eq(1)
+        expect(json_response.first["text_content"]).to eq("Hello")
       end
     end
 
@@ -98,8 +100,8 @@ RSpec.describe Api::V1::MessagesController, type: :controller do
         do_request
         json_response = JSON.parse(response.body)
 
-        expect(json_response["messages"].length).to eq(2)
-        expect(json_response["messages"].map { |msg| msg["role"] }).to contain_exactly("user", "model")
+        expect(json_response.length).to eq(2)
+        expect(json_response.map { |msg| msg["role"] }).to contain_exactly("user", "model")
       end
     end
   end

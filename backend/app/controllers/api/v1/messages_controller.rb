@@ -14,7 +14,7 @@ class Api::V1::MessagesController < ApplicationController
   def index
     turns = conversation.conversation_turns.text_messages.limited_for_display
 
-    render json: { messages: Resources::Messages.call(conversation_turns: turns) }
+    render json: turns, each_serializer: MessageSerializer
   end
 
   private

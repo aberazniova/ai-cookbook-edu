@@ -1,5 +1,6 @@
 import { apiBaseUrl } from 'utils/api';
 import { Message } from 'types/messages';
+import camelcaseKeys from 'camelcase-keys';
 
 export const sendMessage = async (message: string): Promise<string> => {
   const response = await fetch(`${apiBaseUrl}/messages`, {
@@ -26,5 +27,5 @@ export const getMessages = async (): Promise<Message[]> => {
     throw new Error(`Error loading messages! ${data.message || `status: ${response.status}`}`);
   }
 
-  return data.messages;
+  return camelcaseKeys(data);
 };

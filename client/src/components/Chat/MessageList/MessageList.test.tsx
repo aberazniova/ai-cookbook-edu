@@ -4,15 +4,13 @@ import MessageList from './MessageList';
 import { waitFor } from '@testing-library/dom';
 import { vi } from 'vitest';
 
-const messagesResponse = {
-  messages: [
-    { textContent: 'Hello', role: 'user' },
-    { textContent: 'Hi', role: 'assistant' },
-    { textContent: 'How are you?', role: 'user' },
-    { textContent: 'I am fine.', role: 'assistant' },
-    { textContent: 'Great!', role: 'user' },
-  ]
-};
+const messagesResponse = [
+  { textContent: 'Hello', role: 'user' },
+  { textContent: 'Hi', role: 'model' },
+  { textContent: 'How are you?', role: 'user' },
+  { textContent: 'I am fine.', role: 'model' },
+  { textContent: 'Great!', role: 'user' },
+];
 
 beforeAll(() => {
   global.fetch = vi.fn((url) => {
