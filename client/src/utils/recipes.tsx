@@ -1,8 +1,9 @@
 import { apiBaseUrl } from 'utils/api';
+import { authFetch } from 'utils/authFetch';
 import type { RecipeCard, Recipe } from 'types/recipes';
 
 export const getRecipesList = async (): Promise<RecipeCard[]> => {
-  const response = await fetch(`${apiBaseUrl}/recipes`);
+  const response = await authFetch(`${apiBaseUrl}/recipes`);
   const data = await response.json();
 
   if (!response.ok) {
@@ -13,7 +14,7 @@ export const getRecipesList = async (): Promise<RecipeCard[]> => {
 };
 
 export const getRecipe = async (id: number): Promise<Recipe> => {
-  const response = await fetch(`${apiBaseUrl}/recipes/${id}`);
+  const response = await authFetch(`${apiBaseUrl}/recipes/${id}`);
   const data = await response.json();
 
   if (!response.ok) {

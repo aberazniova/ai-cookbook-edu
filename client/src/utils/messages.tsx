@@ -1,14 +1,12 @@
 import { apiBaseUrl } from 'utils/api';
+import { authFetch } from 'utils/authFetch';
 import { Message } from 'types/messages';
 import camelcaseKeys from 'camelcase-keys';
 
 export const sendMessage = async (message: string): Promise<string> => {
-  const response = await fetch(`${apiBaseUrl}/messages`, {
+  const response = await authFetch(`${apiBaseUrl}/messages`, {
     method: 'POST',
     body: JSON.stringify({ message }),
-    headers: {
-      'Content-Type': 'application/json',
-    },
   });
   const data = await response.json();
 
@@ -20,7 +18,7 @@ export const sendMessage = async (message: string): Promise<string> => {
 };
 
 export const getMessages = async (): Promise<Message[]> => {
-  const response = await fetch(`${apiBaseUrl}/messages`);
+  const response = await authFetch(`${apiBaseUrl}/messages`);
   const data = await response.json();
 
   if (!response.ok) {
