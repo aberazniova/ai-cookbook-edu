@@ -1,4 +1,5 @@
 class Api::V1::MessagesController < ApplicationController
+  before_action :authenticate_user!
   before_action :validate_user_message!, only: :create
 
   def create

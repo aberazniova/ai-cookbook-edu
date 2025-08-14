@@ -1,0 +1,154 @@
+require "rails_helper"
+
+RSpec.describe "Messages API", type: :request do
+  describe "GET /api/v1/messages" do
+    subject(:do_request) { get "/api/v1/messages", headers: headers }
+
+    it_behaves_like "when unauthorized"
+
+    context "with valid access token" do
+      let(:user) { create(:user) }
+      let(:headers) { Devise::JWT::TestHelpers.auth_headers({ "Accept" => "application/json" }, user) }
+
+      let!(:conversation) { create(:conversation) }
+
+      context "when conversation has no messages" do
+        it "returns a successful response" do
+          do_request
+          expect(response).to have_http_status(:ok)
+        end
+
+        it "returns an empty array" do
+          do_request
+          expect(json_response).to eq([])
+        end
+      end
+
+      context "when conversation has messages" do
+        before do
+          create_list(:conversation_turn, 2, :user_message, conversation: conversation)
+        end
+
+        it "returns a successful response" do
+          do_request
+          expect(response).to have_http_status(:ok)
+        end
+
+        it "returns the messages with the text content and roles" do
+          do_request
+          expect(json_response).to eq(
+            conversation.conversation_turns.map { |turn| { "text_content" => turn.text_content, "role" => turn.role.to_s } }
+          )
+        end
+      end
+
+      context "for limiting functionality" do
+        let(:max_display_limit) { ConversationTurn::MAX_MESSAGES_DISPLAY_LIMIT }
+
+        before do
+          create_list(:conversation_turn, max_display_limit + 5, :user_message, conversation: conversation)
+        end
+
+        it "returns only the last MAX_MESSAGES_DISPLAY_LIMIT messages" do
+          do_request
+          expect(json_response.length).to eq(max_display_limit)
+        end
+
+        it "returns the most recent messages when limit is exceeded" do
+          do_request
+
+          expected_turns = conversation.conversation_turns.text_messages.limited_for_display
+
+          expect(json_response.map { |msg| msg["text_content"] }).to eq(
+            expected_turns.map(&:text_content)
+          )
+        end
+      end
+
+      context "for ordering functionality" do
+        let!(:first_message) { create(:conversation_turn, :user_message, conversation: conversation, created_at: 1.hour.ago) }
+        let!(:second_message) { create(:conversation_turn, :model, conversation: conversation, created_at: 30.minutes.ago) }
+        let!(:third_message) { create(:conversation_turn, :user_message, conversation: conversation, created_at: 15.minutes.ago) }
+
+        it "returns messages ordered by creation time ascending" do
+          do_request
+
+          expected_order = [first_message, second_message, third_message]
+          actual_order = json_response.map { |msg| msg["text_content"] }
+
+          expect(actual_order).to eq(expected_order.map(&:text_content))
+        end
+      end
+
+      context "when conversation has messages without text content" do
+        let!(:text_message) { create(:conversation_turn, :user_message, conversation: conversation, text_content: "Hello") }
+        let!(:empty_text_message) { create(:conversation_turn, :model, conversation: conversation, text_content: nil) }
+
+        it "only returns messages with text content" do
+          do_request
+
+          expect(json_response.length).to eq(1)
+          expect(json_response.first["text_content"]).to eq("Hello")
+        end
+      end
+
+      context "for different message types" do
+        let!(:user_message) { create(:conversation_turn, :user_message, conversation: conversation, text_content: "User message") }
+        let!(:model_message) { create(:conversation_turn, :model, conversation: conversation, text_content: "Model response") }
+
+        it "returns both user and model messages with correct roles" do
+          do_request
+
+          expect(json_response.length).to eq(2)
+          expect(json_response.map { |msg| msg["role"] }).to contain_exactly("user", "model")
+        end
+      end
+    end
+  end
+
+  describe "POST /api/v1/messages" do
+    subject(:do_request) { post "/api/v1/messages", params: params, headers: headers }
+
+    let(:params) { { message: message } }
+    let(:message) { "Hello, how are you?" }
+
+    it_behaves_like "when unauthorized"
+
+    context "with valid access token" do
+      let(:user) { create(:user) }
+      let(:headers) { Devise::JWT::TestHelpers.auth_headers({ "Accept" => "application/json" }, user) }
+
+      before do
+        allow(Chatbot::ProcessUserMessage).to receive(:call).and_return(
+          Struct.new(:success?, :response_message, :error).new(true, "Stubbed response message", nil)
+        )
+      end
+
+      context "when user message is present" do
+        it "returns a successful response" do
+          post "/api/v1/messages", params: params, headers: headers
+          expect(response).to have_http_status(:ok)
+        end
+
+        it "returns a response message" do
+          post "/api/v1/messages", params: params, headers: headers
+          expect(response.body).to include("Stubbed response message")
+        end
+      end
+
+      context "when user message is not present" do
+        let(:message) { "" }
+
+        it "returns bad request status" do
+          post "/api/v1/messages", params: params, headers: headers
+          expect(response).to have_http_status(:bad_request)
+        end
+
+        it "returns error message" do
+          post "/api/v1/messages", params: params, headers: headers
+          expect(response.body).to include("Message must be present.")
+        end
+      end
+    end
+  end
+end
