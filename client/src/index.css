@@ -4,7 +4,6 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap');
 
-/* Определения для использования в Tailwind CSS */
 .font-sans {
   font-family: 'Nunito', sans-serif;
 }
@@ -16,9 +15,4 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
 }

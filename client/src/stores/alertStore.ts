@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { combine } from 'zustand/middleware';
+import { randomUid } from 'utils/randomUid';
 
 const REMOVE_ALERT_DELAY = 8000;
 
@@ -31,9 +32,9 @@ export const useAlertStore = create<AlertStore>(
       }));
     };
 
-    const addAlert = (alert: Alert) => {
-      const id = Date.now().toString();
-      const newAlert = { ...alert, id };
+    const addAlert = (alert: Omit<Alert, 'id'>) => {
+      const id = randomUid();
+      const newAlert = { ...alert, id } as Alert;
 
       set((state) => ({
         alerts: [...state.alerts, newAlert],

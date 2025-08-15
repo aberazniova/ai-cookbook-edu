@@ -3,7 +3,7 @@ import { HiArrowSmLeft } from 'react-icons/hi';
 
 function NotFound() {
   return (
-    <div className="flex items-center justify-center min-h-screen bg-stone-50 dark:bg-neutral-950 px-4">
+    <div className="flex items-center justify-center px-4 my-10">
       <div className="text-center">
         <h1 className="mb-2 text-3xl tracking-tight font-extrabold text-gray-800 md:text-4xl dark:text-gray-100">
           Oops!
