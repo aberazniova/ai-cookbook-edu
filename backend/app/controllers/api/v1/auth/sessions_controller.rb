@@ -12,7 +12,7 @@ module Api
             warden.set_user(user, store: false) # triggers devise-jwt dispatch
             render json: user_payload(user), status: :ok
           else
-            head :unauthorized
+            render json: { errors: ["Invalid email or password"] }, status: :unauthorized
           end
         end
 
