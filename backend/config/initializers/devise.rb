@@ -314,7 +314,14 @@ Devise.setup do |config|
   # ==> Configuration for :jwt
   # We use JWT for API access tokens. Dispatch/verify via Warden with devise-jwt.
   config.jwt do |jwt|
-    jwt.secret = ENV.fetch("DEVISE_JWT_SECRET_KEY")
+    jwt.secret = if ENV["DEVISE_JWT_SECRET_KEY"].present?
+      ENV["DEVISE_JWT_SECRET_KEY"]
+    elsif Rails.env.production?
+      raise "DEVISE_JWT_SECRET_KEY must be set in production"
+    else
+      Rails.application.secret_key_base || "test-devise-jwt-secret"
+    end
+
     jwt.expiration_time = 15.minutes.to_i
     jwt.request_formats = { user: [:json] }
     jwt.dispatch_requests = [
