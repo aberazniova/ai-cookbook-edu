@@ -11,12 +11,12 @@ Rails.application.routes.draw do
     namespace :v1 do
       namespace :auth do
         devise_for :users,
-                        path: "",
-                        path_names: { sign_in: "sign_in", sign_out: "sign_out", registration: "sign_up" },
-                        controllers: {
-                          sessions: "api/v1/auth/sessions",
-                          registrations: "api/v1/auth/registrations"
-                        }
+          path: "",
+          path_names: { sign_in: "sign_in", sign_out: "sign_out", registration: "sign_up" },
+          controllers: {
+            sessions: "api/v1/auth/sessions",
+            registrations: "api/v1/auth/registrations"
+          }
       end
 
       resources :recipes, only: [:index, :show]
