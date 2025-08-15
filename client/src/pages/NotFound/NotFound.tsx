@@ -1,4 +1,4 @@
-import { Button } from 'flowbite-react';
+import { Link } from 'react-router-dom';
 import { HiArrowSmLeft } from 'react-icons/hi';
 
 function NotFound() {
@@ -17,15 +17,14 @@ function NotFound() {
         <p className="mb-6 text-lg font-light text-gray-500 dark:text-gray-400">
           We are sorry but the page you requested was not found.
         </p>
-        <Button
-          href="/"
-          size="lg"
+        <Link
+          to="/"
           className="mt-6 inline-flex items-center text-white bg-emerald-600 hover:bg-emerald-700 focus:ring-4 focus:ring-emerald-300
             font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-emerald-500 dark:hover:bg-emerald-600 dark:focus:ring-emerald-900"
         >
           <HiArrowSmLeft className="mr-2 h-5 w-5" />
           Go to Homepage
-        </Button>
+        </Link>
       </div>
     </div>
   );
