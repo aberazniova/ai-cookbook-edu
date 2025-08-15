@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { combine } from 'zustand/middleware';
 import { randomUid } from 'utils/randomUid';
 
-const REMOVE_ALERT_DELAY = 8000;
+const REMOVE_ALERT_DELAY = 5000;
 
 export type AlertType = 'success' | 'failure' | 'warning' | 'info';
 
