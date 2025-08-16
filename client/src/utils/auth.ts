@@ -1,15 +1,15 @@
 import { apiBaseUrl } from 'utils/api';
-import { authFetch } from 'utils/authFetch';
-import { useAuthStore } from 'stores/authStore';
+import { getAuth, setAuth } from 'stores/authStore';
 
 export const signIn = async (email: string, password: string) => {
   const response = await fetch(`${apiBaseUrl}/auth/sign_in`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
     body: JSON.stringify({ user: { email, password } }),
   });
 
-  const data = await response.json();
+  const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
     const errors = data.errors?.join?.(', ') || 'Failed to sign in';
@@ -17,41 +17,66 @@ export const signIn = async (email: string, password: string) => {
   }
 
   const token = response.headers.get('Authorization');
-  if (!token || !data?.user) throw new Error('Failed to sign in');
+  if (!token || !data) throw new Error('Failed to sign in');
 
-  useAuthStore.getState().setAuth(data.user, token);
+  setAuth(data, token);
 
-  return { user: data.user, token };
+  return { user: data, token };
 };
 
 export const signUp = async (email: string, password: string, passwordConfirmation: string) => {
-  const resp = await fetch(`${apiBaseUrl}/auth/sign_up`, {
+  const response = await fetch(`${apiBaseUrl}/auth/sign_up`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
     body: JSON.stringify({ user: { email, password, password_confirmation: passwordConfirmation } }),
   });
 
-  const data = await resp.json();
+  const data = await response.json().catch(() => ({}));
 
-  if (!resp.ok) {
+  if (!response.ok) {
     const errors = data.errors?.join?.(', ') || 'Unable to sign up';
     throw new Error(errors);
   }
 
-  const token = resp.headers.get('Authorization');
-  if (!token || !data?.user) throw new Error('Failed to sign up');
+  const token = response.headers.get('Authorization');
+  if (!token || !data) throw new Error('Failed to sign up');
 
-  useAuthStore.getState().setAuth(data.user, token);
+  setAuth(data, token);
 
-  return { user: data.user, token };
+  return { user: data, token };
 };
 
 export const logout = async () => {
-  useAuthStore.getState().clearAuth();
+  const response = await fetch(
+    `${apiBaseUrl}/auth/sign_out`,
+    { method: 'DELETE', credentials: 'include' }
+  );
 
-  const resp = await authFetch(`${apiBaseUrl}/auth/sign_out`, { method: 'DELETE' });
-  if (!resp.ok) {
-    const data = await resp.json();
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
     throw new Error(data.errors?.join?.(', ') || 'Failed to sign out');
   }
+
+  getAuth().clearAuth();
+};
+
+export const refreshToken = async (): Promise<string | null> => {
+  const refreshResponse = await fetch(
+    `${apiBaseUrl}/auth/refresh`,
+    { method: 'POST', credentials: 'include' }
+  );
+
+  if (refreshResponse.ok) {
+    const newToken = refreshResponse.headers.get('Authorization');
+    const data = await refreshResponse.json().catch(() => ({}));
+
+    if (newToken && data) {
+      setAuth(data, newToken);
+
+      return newToken;
+    }
+  }
+
+  return null;
 };

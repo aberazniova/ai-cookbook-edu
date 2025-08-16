@@ -17,6 +17,8 @@ Rails.application.routes.draw do
             sessions: "api/v1/auth/sessions",
             registrations: "api/v1/auth/registrations"
           }
+
+        post "refresh", to: "tokens#refresh"
       end
 
       resources :recipes, only: [:index, :show]

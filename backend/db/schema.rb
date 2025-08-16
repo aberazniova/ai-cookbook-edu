@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_13_221701) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_16_000000) do
   create_table "conversation_turns", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "conversation_id", null: false
     t.integer "role", null: false
@@ -41,6 +41,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_13_221701) do
     t.text "instructions", null: false
   end
 
+  create_table "refresh_tokens", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "token_digest", null: false
+    t.datetime "expires_at", null: false
+    t.datetime "revoked_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["token_digest"], name: "index_refresh_tokens_on_token_digest", unique: true
+    t.index ["user_id"], name: "index_refresh_tokens_on_user_id"
+  end
+
   create_table "users", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -56,4 +67,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_13_221701) do
 
   add_foreign_key "conversation_turns", "conversations"
   add_foreign_key "ingredients", "recipes"
+  add_foreign_key "refresh_tokens", "users"
 end

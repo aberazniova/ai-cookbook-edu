@@ -2,6 +2,12 @@ module Api
   module V1
     module Auth
       class SessionsController < Devise::SessionsController
+        include AuthTokensIssuer
+
+        # Skip Devise's signed-out check so our revoke/clear cookie logic
+        # always runs and the response can emit Set-Cookie deletion headers.
+        skip_before_action :verify_signed_out_user, only: :destroy
+
         respond_to :json
 
         # POST /api/v1/auth/sign_in
@@ -9,8 +15,9 @@ module Api
           user = User.find_by(email: email)
 
           if user&.valid_password?(password)
-            warden.set_user(user, store: false) # triggers devise-jwt dispatch
-            render json: user_payload(user), status: :ok
+            issue_refresh_and_access_token(user)
+
+            render json: user, serializer: UserSerializer, status: :ok
           else
             render json: { errors: ["Invalid email or password"] }, status: :unauthorized
           end
@@ -19,14 +26,14 @@ module Api
         # DELETE /api/v1/auth/sign_out
         def destroy
           sign_out(resource_name)
+
+          revoke_refresh_token_from_cookie
+          clear_refresh_cookie
+
           head :no_content
         end
 
         private
-
-        def user_payload(user)
-          { user: { id: user.id, email: user.email } }
-        end
 
         def email
           params.dig(:user, :email)
@@ -34,6 +41,19 @@ module Api
 
         def password
           params.dig(:user, :password)
+        end
+
+        def clear_refresh_cookie
+          cookies.delete(:refresh_token, domain: nil)
+        end
+
+        def revoke_refresh_token_from_cookie
+          raw = cookies.encrypted[:refresh_token]
+          return if raw.blank?
+
+          if (rec = RefreshToken.find_active_by_raw_token(raw))
+            rec.revoke!
+          end
         end
       end
     end

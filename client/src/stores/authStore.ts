@@ -12,9 +12,15 @@ type Actions = {
   clearAuth: () => void;
 };
 
+type AuthStore = AuthState & Actions;
+
 export const useAuthStore = create(
   combine<AuthState, Actions>({ user: null, token: null }, (set) => ({
     setAuth: (user, token) => set(() => ({ user, token })),
     clearAuth: () => set(() => ({ user: null, token: null })),
   }))
 );
+
+export const getAuth = (): AuthStore => useAuthStore.getState();
+export const setAuth = (user: AuthUser | null, token: string | null) => 
+  useAuthStore.getState().setAuth(user, token);

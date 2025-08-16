@@ -326,7 +326,8 @@ Devise.setup do |config|
     jwt.request_formats = { user: [:json] }
     jwt.dispatch_requests = [
       ["POST", %r{^/api/v1/auth/sign_in$}],
-      ["POST", %r{^/api/v1/auth/sign_up$}]
+      ["POST", %r{^/api/v1/auth/sign_up$}],
+      ["POST", %r{^/api/v1/auth/refresh$}]
     ]
     jwt.revocation_requests = []
   end

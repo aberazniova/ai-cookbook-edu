@@ -1,5 +1,5 @@
 ---
-applyTo: 'client/src/**/*.test.tsx'
+applyTo: 'client'
 ---
 
 # Frontend Testing Instructions

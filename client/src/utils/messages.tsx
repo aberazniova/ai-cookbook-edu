@@ -8,7 +8,7 @@ export const sendMessage = async (message: string): Promise<string> => {
     method: 'POST',
     body: JSON.stringify({ message }),
   });
-  const data = await response.json();
+  const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
     throw new Error(`Error processing message! ${data.message || `status: ${response.status}`}`);
@@ -19,7 +19,7 @@ export const sendMessage = async (message: string): Promise<string> => {
 
 export const getMessages = async (): Promise<Message[]> => {
   const response = await authFetch(`${apiBaseUrl}/messages`);
-  const data = await response.json();
+  const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
     throw new Error(`Error loading messages! ${data.message || `status: ${response.status}`}`);

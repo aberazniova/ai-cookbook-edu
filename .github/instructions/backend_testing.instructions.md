@@ -1,5 +1,5 @@
 ---
-applyTo: 'backend/spec'
+applyTo: 'backend'
 ---
 
 # Backend Testing Rules
@@ -175,8 +175,8 @@ end
 ```
 
 ## Single Assertions
-- Each test should make only one assertion for clarity and easier debugging
 - Focus on testing one specific behavior per test
+- Prefer one expectation per `it` block for clarity and easier debugging
 
 ### Good Examples:
 ```ruby
@@ -260,4 +260,14 @@ describe User do
     expect(user.errors[:username]).to include("can't be blank")
   end
 end
+```
+
+
+## Test helpers
+- Prefer using the `json_response` test helper to parse JSON responses instead of `JSON.parse(response.body)`.
+
+```ruby
+# Good: use helper
+body = json_response
+expect(body["id"]).to eq(user.id)
 ```

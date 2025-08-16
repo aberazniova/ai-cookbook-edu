@@ -4,7 +4,7 @@ import type { RecipeCard, Recipe } from 'types/recipes';
 
 export const getRecipesList = async (): Promise<RecipeCard[]> => {
   const response = await authFetch(`${apiBaseUrl}/recipes`);
-  const data = await response.json();
+  const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
     throw new Error(`Error fetching recipes! ${data.message || `status: ${response.status}`}`);
@@ -15,7 +15,7 @@ export const getRecipesList = async (): Promise<RecipeCard[]> => {
 
 export const getRecipe = async (id: number): Promise<Recipe> => {
   const response = await authFetch(`${apiBaseUrl}/recipes/${id}`);
-  const data = await response.json();
+  const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
     throw new Error(`Error fetching recipe! ${data.message || `status: ${response.status}`}`);

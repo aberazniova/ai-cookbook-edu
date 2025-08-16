@@ -1,26 +1,38 @@
 import { useEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
+
 import { useAuthStore } from 'stores/authStore';
+import { refreshToken } from 'utils/auth';
+import LoadingSpinner from 'components/Common/LoadingSpinner/LoadingSpinner';
 
 function RequireAuth() {
   const user = useAuthStore((s) => s.user);
   const token = useAuthStore((s) => s.token);
 
-  const [verifiedAuth, setVerifiedAuth] = useState(false);
-
   const navigate = useNavigate();
 
+  const [verifiedAuth, setVerifiedAuth] = useState(false);
+
   useEffect(() => {
-    if (!user || !token) {
-      navigate('/sign-in', { replace: true });
-    } else {
-      setVerifiedAuth(true);
-    }
+    const checkAuth = async () => {
+      if (user && token) {
+        setVerifiedAuth(true);
+        return;
+      }
+
+      if (await refreshToken()) {
+        setVerifiedAuth(true);
+      } else {
+        navigate('/sign-in');
+      }
+    };
+
+    checkAuth();
   }, [user, token, navigate]);
 
   return (
     <>
-      {verifiedAuth ? <Outlet /> : null}
+      {verifiedAuth ? <Outlet /> : <LoadingSpinner />}
     </>
   );
 }
