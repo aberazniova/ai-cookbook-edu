@@ -53,6 +53,7 @@ group :development, :test do
 end
 
 gem "rack-cors", "~> 3.0"
+gem "rack-attack"
 
 gem "faraday", "~> 2.13"
 gem "active_model_serializers"
