@@ -10,7 +10,7 @@ RSpec.describe "Messages API", type: :request do
       let(:user) { create(:user) }
       let(:headers) { Devise::JWT::TestHelpers.auth_headers({ "Accept" => "application/json" }, user) }
 
-      let!(:conversation) { create(:conversation) }
+      let!(:conversation) { create(:conversation, user: user) }
 
       context "when conversation has no messages" do
         it "returns a successful response" do

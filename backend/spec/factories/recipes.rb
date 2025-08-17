@@ -1,5 +1,6 @@
 FactoryBot.define do
   factory :recipe do
+    association :user
     title { Faker::Food.dish }
     instructions { Faker::Lorem.paragraph(sentence_count: 5) }
 

@@ -1,16 +1,18 @@
 require "rails_helper"
 
 RSpec.describe Chatbot::FunctionCalls::UpdateRecipe do
+  let(:user) { create(:user) }
   subject(:call) do
     described_class.call(
       id: recipe_id,
       title: new_title,
       ingredients: new_ingredients,
-      instructions: new_instructions
+      instructions: new_instructions,
+      user: user
     )
   end
 
-  let(:recipe) { create(:recipe, title: "Old Title", instructions: "Old instructions") }
+  let(:recipe) { create(:recipe, title: "Old Title", instructions: "Old instructions", user: user) }
   let(:recipe_id) { recipe.id }
   let!(:old_ingredients) { create_list(:ingredient, 2, recipe: recipe) }
   let(:new_title) { "New Title" }
@@ -34,7 +36,7 @@ RSpec.describe Chatbot::FunctionCalls::UpdateRecipe do
   end
 
   context "when only some params are provided" do
-    subject(:call) { described_class.call(id: recipe.id, title: new_title) }
+    subject(:call) { described_class.call(id: recipe.id, title: new_title, user: user) }
 
     it "updates only the provided fields" do
       call

@@ -7,4 +7,6 @@ class User < ApplicationRecord
          jwt_revocation_strategy: Devise::JWT::RevocationStrategies::Null
 
   has_many :refresh_tokens, dependent: :delete_all
+  has_many :recipes, dependent: :destroy
+  has_many :conversations, dependent: :destroy
 end

@@ -2,9 +2,10 @@
 require "rails_helper"
 
 RSpec.describe Recipes::UpdateRecipe do
-  subject(:call) { described_class.call(recipe: recipe, params: params) }
+  let(:user) { create(:user) }
+  subject(:call) { described_class.call(recipe: recipe, params: params, user: user) }
 
-  let(:recipe) { create(:recipe, title: "Old Title", instructions: "Old instructions") }
+  let(:recipe) { create(:recipe, title: "Old Title", instructions: "Old instructions", user: user) }
   let(:new_title) { "New Title" }
   let(:new_instructions) { "New instructions" }
   let(:params) { { title: new_title, instructions: new_instructions } }
@@ -35,6 +36,15 @@ RSpec.describe Recipes::UpdateRecipe do
       call
       recipe.reload
       expect(recipe.ingredients.pluck(:name)).to match_array(old_ingredients.pluck(:name))
+    end
+  end
+
+  context "when the recipe belongs to another user" do
+    let(:other_user) { create(:user) }
+    let(:recipe) { create(:recipe, user: other_user) }
+
+    it "raises a NotAuthorizedError when trying to update" do
+      expect { call }.to raise_error(Pundit::NotAuthorizedError)
     end
   end
 end

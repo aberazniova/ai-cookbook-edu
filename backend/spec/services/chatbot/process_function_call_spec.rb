@@ -6,7 +6,8 @@ RSpec.describe Chatbot::ProcessFunctionCall do
 
     let(:function_call_name) { "create_recipe" }
     let(:function_call_args) { { "title" => "Test Recipe", "ingredients" => ["Ingredient 1"], "instructions" => "Test instructions" } }
-    let(:conversation) { create(:conversation) }
+    let(:user) { create(:user) }
+    let(:conversation) { create(:conversation, user: user) }
     let(:function_result) { { "status" => "success", "message" => "Recipe saved successfully" } }
     let(:gemini_response) { "Recipe created successfully!" }
 
@@ -70,7 +71,9 @@ RSpec.describe Chatbot::ProcessFunctionCall do
 
         it "calls the #{function_call[:name]} service" do
           call
-          expect(function_call[:service]).to have_received(:call).with(function_call[:args].transform_keys(&:to_sym))
+          expected_args = function_call[:args].transform_keys(&:to_sym).merge(user: user)
+
+          expect(function_call[:service]).to have_received(:call).with(expected_args)
         end
       end
     end

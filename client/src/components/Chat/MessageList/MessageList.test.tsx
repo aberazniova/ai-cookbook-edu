@@ -3,6 +3,7 @@ import '@testing-library/jest-dom';
 import MessageList from './MessageList';
 import { waitFor } from '@testing-library/dom';
 import { vi } from 'vitest';
+import { useAuthStore } from 'stores/authStore';
 
 const messagesResponse = [
   { textContent: 'Hello', role: 'user' },
@@ -29,6 +30,14 @@ afterAll(() => {
 });
 
 describe('MessageList', () => {
+  beforeEach(() => {
+    useAuthStore.getState().setAuth({ id: 1, email: 'user@example.com' }, 'test-token');
+  });
+
+  afterEach(() => {
+    useAuthStore.getState().clearAuth();
+  });
+
   it('renders the message content', async () => {
     render(<MessageList />);
 
@@ -38,3 +47,4 @@ describe('MessageList', () => {
     });
   });
 });
+

@@ -3,14 +3,20 @@ module Chatbot
     class CreateRecipe
       include Callable
 
-      def initialize(title:, ingredients:, instructions:)
+      def initialize(title:, ingredients:, instructions:, user:)
         @title = title
         @ingredients = ingredients
         @instructions = instructions
+        @user = user
       end
 
       def call
-        recipe = Recipes::CreateRecipe.call(title: title, ingredients: ingredients, instructions: instructions)
+        recipe = Recipes::CreateRecipe.call(
+          title: title,
+          ingredients: ingredients,
+          instructions: instructions,
+          user: user
+        )
 
         {
           "status": "success",
@@ -21,7 +27,7 @@ module Chatbot
 
       private
 
-      attr_reader :title, :ingredients, :instructions
+      attr_reader :title, :ingredients, :instructions, :user
     end
   end
 end

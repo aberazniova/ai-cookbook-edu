@@ -4,6 +4,8 @@ RSpec.describe "Recipes API", type: :request do
   describe "GET /api/v1/recipes" do
     subject(:do_request) { get "/api/v1/recipes", headers: headers }
 
+    let!(:recipe) { create(:recipe, :with_ingredients, title: "Test Recipe", instructions: "Test instructions") }
+
     it_behaves_like "when unauthorized"
 
     context "with valid access token" do
@@ -23,9 +25,10 @@ RSpec.describe "Recipes API", type: :request do
       end
 
       context "when there are recipes" do
-        let!(:recipe1) { create(:recipe, :with_ingredients, title: "Pasta Carbonara", created_at: 1.hour.ago) }
-        let!(:recipe2) { create(:recipe, :with_ingredients, title: "Chicken Curry", created_at: 30.minutes.ago) }
-        let!(:recipe3) { create(:recipe, :with_ingredients, title: "Beef Stew", created_at: 15.minutes.ago) }
+        let!(:recipe1) { create(:recipe, :with_ingredients, title: "Pasta Carbonara", created_at: 1.hour.ago, user: user) }
+        let!(:recipe2) { create(:recipe, :with_ingredients, title: "Chicken Curry", created_at: 30.minutes.ago, user: user) }
+        let!(:recipe3) { create(:recipe, :with_ingredients, title: "Beef Stew", created_at: 15.minutes.ago, user: user) }
+        let!(:other_user_recipe) { create(:recipe, :with_ingredients, user: create(:user)) }
 
         it "returns a successful response" do
           do_request
@@ -52,14 +55,21 @@ RSpec.describe "Recipes API", type: :request do
           recipe_data = json_response.first
           expect(recipe_data).to eq(expected_payload)
         end
+
+        it "does not return recipes owned by other users" do
+          do_request
+
+          expect(json_response.map { |r| r["id"] }).not_to include(other_user_recipe.id)
+          expect(json_response.count).to eq(3)
+        end
       end
     end
   end
 
   describe "GET /api/v1/recipes/:id" do
     subject(:do_request) { get "/api/v1/recipes/#{recipe_id}", headers: headers }
-
     let(:recipe_id) { recipe.id }
+
     let!(:recipe) { create(:recipe, :with_ingredients, title: "Test Recipe", instructions: "Test instructions") }
 
     it_behaves_like "when unauthorized"
@@ -67,6 +77,7 @@ RSpec.describe "Recipes API", type: :request do
     context "with valid access token" do
       let(:user) { create(:user) }
       let(:headers) { Devise::JWT::TestHelpers.auth_headers({ "Accept" => "application/json" }, user) }
+      let!(:recipe) { create(:recipe, :with_ingredients, title: "Test Recipe", instructions: "Test instructions", user: user) }
 
       context "when recipe exists" do
         it "returns a successful response" do

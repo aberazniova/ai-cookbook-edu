@@ -2,7 +2,8 @@ require "rails_helper"
 
 RSpec.describe Chatbot::FunctionCalls::CreateRecipe do
   describe "#call" do
-    subject(:call) { described_class.call(title: title, ingredients: ingredients, instructions: instructions) }
+    let(:user) { create(:user) }
+    subject(:call) { described_class.call(title: title, ingredients: ingredients, instructions: instructions, user: user) }
 
     let(:title) { "Test Recipe" }
     let(:ingredients) { ["Ingredient 1", "Ingredient 2"] }
@@ -16,7 +17,8 @@ RSpec.describe Chatbot::FunctionCalls::CreateRecipe do
       expect(Recipes::CreateRecipe).to receive(:call).with(
         title: title,
         ingredients: ingredients,
-        instructions: instructions
+        instructions: instructions,
+        user: user
       )
       call
     end

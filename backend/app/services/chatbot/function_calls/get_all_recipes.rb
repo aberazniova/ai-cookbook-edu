@@ -3,6 +3,10 @@ module Chatbot
     class GetAllRecipes
       include Callable
 
+      def initialize(user:)
+        @user = user
+      end
+
       def call
         {
           "status": "success",
@@ -12,15 +16,17 @@ module Chatbot
 
       private
 
-      def recipes
-        Recipe.all
-      end
+      attr_reader :user
 
       def recipes_data
         ActiveModelSerializers::SerializableResource.new(
           recipes,
           each_serializer: RecipeDetailSerializer
         ).as_json
+      end
+
+      def recipes
+        Pundit.policy_scope!(user, Recipe)
       end
     end
   end

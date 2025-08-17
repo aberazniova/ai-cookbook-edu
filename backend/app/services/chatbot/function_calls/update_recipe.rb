@@ -3,15 +3,16 @@ module Chatbot
     class UpdateRecipe
       include Callable
 
-      def initialize(id:, title: nil, ingredients: nil, instructions: nil)
+      def initialize(id:, user:, title: nil, ingredients: nil, instructions: nil)
         @id = id
+        @user = user
         @title = title
         @ingredients = ingredients
         @instructions = instructions
       end
 
       def call
-        updated_recipe = Recipes::UpdateRecipe.call(recipe: recipe, params: update_params)
+        updated_recipe = Recipes::UpdateRecipe.call(recipe: recipe, params: update_params, user: user)
 
         {
           "status": "success",
@@ -22,7 +23,7 @@ module Chatbot
 
       private
 
-      attr_reader :id, :title, :ingredients, :instructions
+      attr_reader :id, :title, :ingredients, :instructions, :user
 
       def recipe
         Recipe.find(id)

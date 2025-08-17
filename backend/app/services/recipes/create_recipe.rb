@@ -2,14 +2,17 @@ module Recipes
   class CreateRecipe
     include Callable
 
-    def initialize(title:, ingredients:, instructions:)
+    def initialize(title:, ingredients:, instructions:, user:)
       @title = title
       @ingredients = ingredients
       @instructions = instructions
+      @user = user
     end
 
     def call
-      recipe = Recipe.create!(title: title, instructions: instructions)
+      authorise_user!
+
+      recipe = Recipe.create!(title: title, instructions: instructions, user: user)
       Recipes::CreateIngredients.call(recipe: recipe, ingredients: ingredients)
 
       recipe
@@ -17,6 +20,10 @@ module Recipes
 
     private
 
-    attr_reader :title, :ingredients, :instructions
+    attr_reader :title, :ingredients, :instructions, :user
+
+    def authorise_user!
+      Pundit.authorize(user, Recipe, :create?)
+    end
   end
 end

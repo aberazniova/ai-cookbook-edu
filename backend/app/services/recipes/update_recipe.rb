@@ -2,12 +2,15 @@ module Recipes
   class UpdateRecipe
     include Callable
 
-    def initialize(recipe:, params:)
+    def initialize(recipe:, params:, user:)
       @recipe = recipe
       @params = params
+      @user = user
     end
 
     def call
+      authorise_update!
+
       recipe.update!(recipe_params)
 
       if params[:ingredients].present?
@@ -19,7 +22,7 @@ module Recipes
 
     private
 
-    attr_reader :recipe, :params
+    attr_reader :recipe, :params, :user
 
     def update_ingredients
       recipe.ingredients.destroy_all
@@ -28,6 +31,10 @@ module Recipes
 
     def recipe_params
       params.slice(:title, :instructions)
+    end
+
+    def authorise_update!
+      Pundit.authorize(user, recipe, :update?)
     end
   end
 end

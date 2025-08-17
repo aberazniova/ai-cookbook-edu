@@ -5,15 +5,23 @@ import LoadingSpinner from 'components/Common/LoadingSpinner/LoadingSpinner';
 import { getRecipesList } from 'utils/recipes';
 import { type RecipeCard as RecipeCardType } from 'types/recipes';
 import { useAlertStore } from 'stores/alertStore';
+import { useAuthStore } from 'stores/authStore';
 
 function RecipesList() {
   const [recipes, setRecipes] = useState<RecipeCardType[]>([]);
   const [loading, setLoading] = useState(true);
 
   const addAlert = useAlertStore((state) => state.addAlert);
+  const user = useAuthStore((state) => state.user);
 
   useEffect(() => {
     const fetchRecipes = async () => {
+      if (!user) {
+        setRecipes([]);
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
         const recipes = await getRecipesList();
@@ -30,7 +38,7 @@ function RecipesList() {
     };
 
     fetchRecipes();
-  }, [addAlert]);
+  }, [addAlert, user]);
 
   return (
     <>

@@ -21,7 +21,7 @@ class Api::V1::MessagesController < ApplicationController
   private
 
   def conversation
-    @_conversation ||= Conversation.last || Conversation.create! # TODO: Implement conversation retrieval based on the cookie
+    @_conversation ||= current_user.conversations.last || current_user.conversations.create! # TODO: Implement conversation retrieval based on the cookie
   end
 
   def user_message

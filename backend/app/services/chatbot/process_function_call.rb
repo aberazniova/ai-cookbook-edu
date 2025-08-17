@@ -28,7 +28,7 @@ module Chatbot
         raise StandardError, "Function call not supported: #{function_call_name}"
       end
 
-      function_class.call(**symbolized_arguments)
+      function_class.call(**symbolized_arguments, user: conversation.user)
     rescue StandardError => e
       {
         "status": "error",

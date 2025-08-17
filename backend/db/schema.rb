@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_16_000000) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_17_000002) do
   create_table "conversation_turns", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "conversation_id", null: false
     t.integer "role", null: false
@@ -24,6 +24,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_16_000000) do
   create_table "conversations", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_conversations_on_user_id"
   end
 
   create_table "ingredients", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -39,6 +41,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_16_000000) do
     t.datetime "updated_at", null: false
     t.string "title", null: false
     t.text "instructions", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_recipes_on_user_id"
   end
 
   create_table "refresh_tokens", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -66,6 +70,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_16_000000) do
   end
 
   add_foreign_key "conversation_turns", "conversations"
+  add_foreign_key "conversations", "users"
   add_foreign_key "ingredients", "recipes"
+  add_foreign_key "recipes", "users"
   add_foreign_key "refresh_tokens", "users"
 end
