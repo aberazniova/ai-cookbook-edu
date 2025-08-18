@@ -1,5 +1,20 @@
 require "rails_helper"
 
+shared_examples "creates conversation and sets cookie when missing" do
+  it "creates a conversation for the user" do
+    expect { do_request }.to change { user.conversations.count }.by(1)
+  end
+
+  it "sets an encrypted HttpOnly conversation_id cookie" do
+    do_request
+
+    set_cookie = response.headers["Set-Cookie"]
+    conversation_cookie = set_cookie.to_s.split("\n").find { |c| c.start_with?("conversation_id=") }
+    expect(conversation_cookie).to be_present
+    expect(conversation_cookie.downcase).to include("httponly")
+  end
+end
+
 RSpec.describe "Messages API", type: :request do
   describe "GET /api/v1/messages" do
     subject(:do_request) { get "/api/v1/messages", headers: headers }
@@ -10,9 +25,9 @@ RSpec.describe "Messages API", type: :request do
       let(:user) { create(:user) }
       let(:headers) { Devise::JWT::TestHelpers.auth_headers({ "Accept" => "application/json" }, user) }
 
-      let!(:conversation) { create(:conversation, user: user) }
+      context "when no conversation cookie is present" do
+        include_examples "creates conversation and sets cookie when missing"
 
-      context "when conversation has no messages" do
         it "returns a successful response" do
           do_request
           expect(response).to have_http_status(:ok)
@@ -24,83 +39,105 @@ RSpec.describe "Messages API", type: :request do
         end
       end
 
-      context "when conversation has messages" do
-        before do
-          create_list(:conversation_turn, 2, :user_message, conversation: conversation)
-        end
-
-        it "returns a successful response" do
-          do_request
-          expect(response).to have_http_status(:ok)
-        end
-
-        it "returns the messages with the text content and roles" do
-          do_request
-          expect(json_response).to eq(
-            conversation.conversation_turns.map { |turn| { "text_content" => turn.text_content, "role" => turn.role.to_s } }
-          )
-        end
-      end
-
-      context "for limiting functionality" do
-        let(:max_display_limit) { ConversationTurn::MAX_MESSAGES_DISPLAY_LIMIT }
+      context "when conversation id cookie is present" do
+        let!(:conversation) { create(:conversation, user: user) }
 
         before do
-          create_list(:conversation_turn, max_display_limit + 5, :user_message, conversation: conversation)
+          # Stubbing the controller's conversation_id in the spec because crafting a real
+          # cookies.encrypted value ties tests to encryption internals.
+          allow_any_instance_of(Api::V1::MessagesController).to receive(:conversation_id).and_return(conversation.id)
         end
 
-        it "returns only the last MAX_MESSAGES_DISPLAY_LIMIT messages" do
-          do_request
-          expect(json_response.length).to eq(max_display_limit)
+        context "when conversation has no messages" do
+          it "returns a successful response" do
+            do_request
+            expect(response).to have_http_status(:ok)
+          end
+
+          it "returns an empty array" do
+            do_request
+            expect(json_response).to eq([])
+          end
         end
 
-        it "returns the most recent messages when limit is exceeded" do
-          do_request
+        context "when conversation has messages" do
+          before do
+            create_list(:conversation_turn, 2, :user_message, conversation: conversation)
+          end
 
-          expected_turns = conversation.conversation_turns.text_messages.limited_for_display
+          it "returns a successful response" do
+            do_request
+            expect(response).to have_http_status(:ok)
+          end
 
-          expect(json_response.map { |msg| msg["text_content"] }).to eq(
-            expected_turns.map(&:text_content)
-          )
+          it "returns the messages with the text content and roles" do
+            do_request
+            expect(json_response).to eq(
+              conversation.conversation_turns.map { |turn| { "text_content" => turn.text_content, "role" => turn.role.to_s } }
+            )
+          end
         end
-      end
 
-      context "for ordering functionality" do
-        let!(:first_message) { create(:conversation_turn, :user_message, conversation: conversation, created_at: 1.hour.ago) }
-        let!(:second_message) { create(:conversation_turn, :model, conversation: conversation, created_at: 30.minutes.ago) }
-        let!(:third_message) { create(:conversation_turn, :user_message, conversation: conversation, created_at: 15.minutes.ago) }
+        context "for limiting functionality" do
+          let(:max_display_limit) { ConversationTurn::MAX_MESSAGES_DISPLAY_LIMIT }
 
-        it "returns messages ordered by creation time ascending" do
-          do_request
+            before do
+              create_list(:conversation_turn, max_display_limit + 5, :user_message, conversation: conversation)
+            end
 
-          expected_order = [first_message, second_message, third_message]
-          actual_order = json_response.map { |msg| msg["text_content"] }
+          it "returns only the last MAX_MESSAGES_DISPLAY_LIMIT messages" do
+            do_request
+            expect(json_response.length).to eq(max_display_limit)
+          end
 
-          expect(actual_order).to eq(expected_order.map(&:text_content))
+          it "returns the most recent messages when limit is exceeded" do
+            do_request
+
+            expected_turns = conversation.conversation_turns.text_messages.limited_for_display
+
+            expect(json_response.map { |msg| msg["text_content"] }).to eq(
+              expected_turns.map(&:text_content)
+            )
+          end
         end
-      end
 
-      context "when conversation has messages without text content" do
-        let!(:text_message) { create(:conversation_turn, :user_message, conversation: conversation, text_content: "Hello") }
-        let!(:empty_text_message) { create(:conversation_turn, :model, conversation: conversation, text_content: nil) }
+        context "for ordering functionality" do
+          let!(:first_message) { create(:conversation_turn, :user_message, conversation: conversation, created_at: 1.hour.ago) }
+          let!(:second_message) { create(:conversation_turn, :model, conversation: conversation, created_at: 30.minutes.ago) }
+          let!(:third_message) { create(:conversation_turn, :user_message, conversation: conversation, created_at: 15.minutes.ago) }
 
-        it "only returns messages with text content" do
-          do_request
+          it "returns messages ordered by creation time ascending" do
+            do_request
 
-          expect(json_response.length).to eq(1)
-          expect(json_response.first["text_content"]).to eq("Hello")
+            expected_order = [first_message, second_message, third_message]
+            actual_order = json_response.map { |msg| msg["text_content"] }
+
+            expect(actual_order).to eq(expected_order.map(&:text_content))
+          end
         end
-      end
 
-      context "for different message types" do
-        let!(:user_message) { create(:conversation_turn, :user_message, conversation: conversation, text_content: "User message") }
-        let!(:model_message) { create(:conversation_turn, :model, conversation: conversation, text_content: "Model response") }
+        context "when conversation has messages without text content" do
+          let!(:text_message) { create(:conversation_turn, :user_message, conversation: conversation, text_content: "Hello") }
+          let!(:empty_text_message) { create(:conversation_turn, :model, conversation: conversation, text_content: nil) }
 
-        it "returns both user and model messages with correct roles" do
-          do_request
+          it "only returns messages with text content" do
+            do_request
 
-          expect(json_response.length).to eq(2)
-          expect(json_response.map { |msg| msg["role"] }).to contain_exactly("user", "model")
+            expect(json_response.length).to eq(1)
+            expect(json_response.first["text_content"]).to eq("Hello")
+          end
+        end
+
+        context "for different message types" do
+          let!(:user_message) { create(:conversation_turn, :user_message, conversation: conversation, text_content: "User message") }
+          let!(:model_message) { create(:conversation_turn, :model, conversation: conversation, text_content: "Model response") }
+
+          it "returns both user and model messages with correct roles" do
+            do_request
+
+            expect(json_response.length).to eq(2)
+            expect(json_response.map { |msg| msg["role"] }).to contain_exactly("user", "model")
+          end
         end
       end
     end
@@ -133,6 +170,38 @@ RSpec.describe "Messages API", type: :request do
         it "returns a response message" do
           post "/api/v1/messages", params: params, headers: headers
           expect(response.body).to include("Stubbed response message")
+        end
+
+        context "when conversation id cookie is present" do
+          include_examples "creates conversation and sets cookie when missing"
+
+          it "calls Chatbot::ProcessUserMessage with the created conversation" do
+            do_request
+            conversation = Conversation.last
+
+            expect(Chatbot::ProcessUserMessage).to have_received(:call).with(
+              message_content: message,
+              conversation: conversation
+            )
+          end
+        end
+
+        context "when conversation id cookie is present" do
+          let(:conversation) { create(:conversation, user: user) }
+
+          before do
+            # Stubbing the controller's conversation_id in the spec because crafting a real
+            # cookies.encrypted value ties tests to encryption internals.
+            allow_any_instance_of(Api::V1::MessagesController).to receive(:conversation_id).and_return(conversation.id)
+          end
+
+          it "calls Chatbot::ProcessUserMessage with the existing conversation" do
+            expect(Chatbot::ProcessUserMessage).to receive(:call).with(
+              message_content: message,
+              conversation: conversation
+            )
+            do_request
+          end
         end
       end
 

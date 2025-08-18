@@ -21,7 +21,29 @@ class Api::V1::MessagesController < ApplicationController
   private
 
   def conversation
-    @_conversation ||= current_user.conversations.last || current_user.conversations.create! # TODO: Implement conversation retrieval based on the cookie
+    @_conversation ||= begin
+      return current_conversation if current_conversation.present?
+
+      new_conversation = current_user.conversations.create!
+      cookies.encrypted[:conversation_id] = {
+        value: new_conversation.id,
+        httponly: true,
+        secure: Rails.env.production?,
+        same_site: :lax
+      }
+
+      new_conversation
+    end
+  end
+
+  def current_conversation
+    return @_current_conversation if defined?(@_current_conversation)
+
+    @_current_conversation = current_user.conversations.find_by(id: conversation_id)
+  end
+
+  def conversation_id
+    cookies.encrypted[:conversation_id]
   end
 
   def user_message

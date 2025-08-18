@@ -16,6 +16,7 @@ module AuthTokensIssuer
       httponly: true,
       secure: Rails.env.production?,
       same_site: :lax,
+      path: "/api/v1/auth",
       expires: result.record.expires_at
     }
   end

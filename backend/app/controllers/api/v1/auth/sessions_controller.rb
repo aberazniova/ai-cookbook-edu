@@ -28,7 +28,7 @@ module Api
           sign_out(resource_name)
 
           revoke_refresh_token_from_cookie
-          clear_refresh_cookie
+          clear_cookies
 
           head :no_content
         end
@@ -43,8 +43,9 @@ module Api
           params.dig(:user, :password)
         end
 
-        def clear_refresh_cookie
-          cookies.delete(:refresh_token, domain: nil)
+        def clear_cookies
+          cookies.delete(:refresh_token, path: "/api/v1/auth")
+          cookies.delete(:conversation_id)
         end
 
         def revoke_refresh_token_from_cookie

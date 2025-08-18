@@ -7,6 +7,7 @@ export const sendMessage = async (message: string): Promise<string> => {
   const response = await authFetch(`${apiBaseUrl}/messages`, {
     method: 'POST',
     body: JSON.stringify({ message }),
+    credentials: 'include',
   });
   const data = await response.json().catch(() => ({}));
 
@@ -18,7 +19,9 @@ export const sendMessage = async (message: string): Promise<string> => {
 };
 
 export const getMessages = async (): Promise<Message[]> => {
-  const response = await authFetch(`${apiBaseUrl}/messages`);
+  const response = await authFetch(`${apiBaseUrl}/messages`, {
+    credentials: 'include',
+  });
   const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
