@@ -4,7 +4,7 @@ RSpec.describe "Tokens Refresh", type: :request do
   describe "POST /api/v1/auth/refresh" do
     subject(:do_request) { post "/api/v1/auth/refresh", as: :json, headers: headers }
 
-    let(:password) { "Password!" }
+    let(:password) { "Password!123" }
     let(:user) { create(:user, password: password, password_confirmation: password) }
 
     context "when refresh token is missing" do
