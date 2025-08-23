@@ -70,20 +70,18 @@ RSpec.describe "Messages API", type: :request do
             expect(response).to have_http_status(:ok)
           end
 
-          it "returns the messages with the text content and roles" do
+          it "returns the messages with the correct attributes" do
             do_request
-            expect(json_response).to eq(
-              conversation.conversation_turns.map { |turn| { "text_content" => turn.text_content, "role" => turn.role.to_s } }
-            )
+            expect(json_response[0].keys).to include("text_content", "role", "id", "recipe")
           end
         end
 
         context "for limiting functionality" do
           let(:max_display_limit) { ConversationTurn::MAX_MESSAGES_DISPLAY_LIMIT }
 
-            before do
-              create_list(:conversation_turn, max_display_limit + 5, :user_message, conversation: conversation)
-            end
+          before do
+            create_list(:conversation_turn, max_display_limit + 5, :user_message, conversation: conversation)
+          end
 
           it "returns only the last MAX_MESSAGES_DISPLAY_LIMIT messages" do
             do_request

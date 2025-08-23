@@ -4,6 +4,7 @@ import Message from './Message';
 import type { Message as MessageType } from 'types/messages';
 
 const baseMessage: MessageType = {
+  id: '1',
   textContent: 'Hello, world!',
   role: 'user',
 };

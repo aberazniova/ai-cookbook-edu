@@ -1,10 +1,12 @@
-import { Textarea, Button } from 'flowbite-react';
-import { HiPaperAirplane } from 'react-icons/hi';
+import { FaSpinner as Loader2 } from 'react-icons/fa';
 import { useState } from 'react';
+import { FiSend as Send } from 'react-icons/fi';
+import { Textarea, Button } from 'flowbite-react';
 
 import { sendMessage } from 'utils/messages';
 import { useMessagesStore } from 'stores/messagesStore';
 import { useAlertStore } from 'stores/alertStore';
+import VoiceInput from 'components/Chat/MessageInput/VoiceInput/VoiceInput';
 
 function MessageInput() {
   const [message, setMessage] = useState('');
@@ -17,6 +19,7 @@ function MessageInput() {
     if (message.trim() === '' || isLoading) return;
 
     addMessage({
+      id: String(Date.now()),
       textContent: message,
       role: 'user',
     });
@@ -32,6 +35,7 @@ function MessageInput() {
       }
 
       addMessage({
+        id: String(Date.now() + 1),
         textContent: response,
         role: 'model',
       });
@@ -45,27 +49,38 @@ function MessageInput() {
     }
   };
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      handleSendMessage();
+    }
+  };
+
   return (
-    <div className="p-5 lg:p-6 border-t border-stone-200 dark:border-neutral-700">
-      <Textarea
-        id="chat-input"
-        placeholder="Ask me for a recipe..."
-        rows={3}
-        className="w-full rounded-xl border border-stone-300 dark:border-neutral-600 bg-stone-100 dark:bg-neutral-700 text-gray-900 dark:text-gray-100
-focus:ring-emerald-600 focus:border-emerald-600 placeholder-gray-400 dark:placeholder-gray-400 resize-none"
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-        disabled={isLoading}
-      />
-      <Button
-        className="mt-4 w-full bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white font-semibold
-focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:ring-opacity-50
-rounded-xl transition-all duration-200 shadow-md hover:shadow-lg py-3 disabled:opacity-50 disabled:cursor-not-allowed"
-        onClick={handleSendMessage}
-        disabled={isLoading || message.trim() === ''}
-      >
-        {isLoading ? 'Sending...' : 'Send'} <HiPaperAirplane className="ml-2 h-5 w-5 transform rotate-90" />
-      </Button>
+    <div className="p-4 border-t border-gray-100 bg-gray-50">
+      <div className="flex gap-3">
+        <Textarea
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Type your message here..."
+          className="flex-1 border-gray-200 bg-white shadow-sm focus:border-gray-200 px-4 py-2 rounded-xl placeholder-gray-500"
+          aria-label="Chat input"
+          disabled={isLoading}
+          rows={1}
+        />
+        <VoiceInput disabled={isLoading} onResult={setMessage} />
+        <Button
+          type="button"
+          onClick={handleSendMessage}
+          disabled={!message.trim() || isLoading}
+          className="rounded-xl text-white shadow-md hover:shadow-lg px-3 bg-terracotta hover:bg-terracotta-700 focus:ring-0"
+          aria-label="Send message"
+          data-testid="send-button"
+        >
+          {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+        </Button>
+      </div>
     </div>
   );
 }

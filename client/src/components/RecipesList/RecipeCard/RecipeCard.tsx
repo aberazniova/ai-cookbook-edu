@@ -9,9 +9,10 @@ function RecipeCard({ recipe }: { recipe: RecipeCardType }) {
     <Link to={`/recipes/${recipe.id}`} className="block">
       <Card
         key={recipe.id}
-        className="max-w-sm transform transition-all duration-300 hover:scale-[1.02] hover:shadow-xl
-bg-white dark:bg-neutral-800 border border-stone-100 dark:border-neutral-700
-rounded-2xl overflow-hidden shadow-lg group"
+        className={`
+          max-w-sm transform transition-all duration-300 hover:scale-[1.02] hover:shadow-xl bg-white dark:bg-neutral-800 border
+          border-stone-100 dark:border-neutral-700 rounded-2xl overflow-hidden shadow-lg group
+        `}
       >
         <div className="h-full flex flex-col justify-start gap-4">
           {recipe.imageUrl ? (
@@ -21,8 +22,8 @@ rounded-2xl overflow-hidden shadow-lg group"
               className="rounded-t-2xl object-cover w-full h-48 lg:h-56 transition-transform duration-300 group-hover:scale-105"
             />
           ) : (
-            <div className="flex items-center justify-center w-full h-48 lg:h-56 bg-emerald-100 rounded-2xl dark:bg-emerald-900">
-              <FaLeaf className="w-24 h-24 text-emerald-600 dark:text-emerald-400" />
+            <div className="flex items-center justify-center w-full h-48 lg:h-56 bg-sage-green-200 rounded-2xl dark:bg-sage-green-800">
+              <FaLeaf className="w-24 h-24 text-sage-green dark:text-sage-green-200" />
             </div>
           )}
           <div>

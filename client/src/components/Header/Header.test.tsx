@@ -58,14 +58,9 @@ describe('Header', () => {
       useAuthStore.getState().clearAuth();
     });
 
-    it('renders Sign In button', () => {
+    it('does not render the user menu trigger', () => {
       renderWithRouter(<Header />);
-      expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument();
-    });
-
-    it('renders Sign Up button', () => {
-      renderWithRouter(<Header />);
-      expect(screen.getByRole('button', { name: /sign up/i })).toBeInTheDocument();
+      expect(screen.queryByTestId('user-menu')).not.toBeInTheDocument();
     });
   });
 });
