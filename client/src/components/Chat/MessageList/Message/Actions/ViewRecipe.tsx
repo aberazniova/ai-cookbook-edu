@@ -3,12 +3,9 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 import { type Recipe } from 'types/recipes';
+import { defaultRecipeImageCompact } from 'utils/defaultRecipeImages';
 
 function ViewRecipe({ recipe }: { recipe: Recipe }) {
-  const defaultRecipeImage = () => {
-    return "/default-recipe.jpeg";
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
@@ -18,7 +15,7 @@ function ViewRecipe({ recipe }: { recipe: Recipe }) {
       <Card className="border-2 shadow-lg overflow-hidden border-sage-green">
         <div className="relative h-32 overflow-hidden">
           <img
-            src={recipe.imageUrl || defaultRecipeImage()}
+            src={recipe.imageUrl || defaultRecipeImageCompact}
             alt={recipe.title}
             className="w-full h-full object-cover"
           />

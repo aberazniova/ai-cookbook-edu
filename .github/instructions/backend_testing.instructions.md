@@ -1,5 +1,5 @@
 ---
-applyTo: 'backend'
+applyTo: 'backend/'
 ---
 
 # Backend Testing Rules

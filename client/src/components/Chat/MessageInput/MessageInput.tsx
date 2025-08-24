@@ -3,12 +3,11 @@ import { useEffect, useState } from 'react';
 import { FiSend as Send, FiMic as Mic } from 'react-icons/fi';
 import { Textarea, Button } from 'flowbite-react';
 import classNames from 'classnames';
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
 import { sendMessage } from 'utils/messages';
 import { useMessagesStore } from 'stores/messagesStore';
 import { useAlertStore } from 'stores/alertStore';
-import React from 'react';
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
 function MessageInput() {
   const [message, setMessage] = useState('');

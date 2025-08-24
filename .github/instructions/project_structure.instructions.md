@@ -16,3 +16,5 @@ applyTo: '**'
 
 - **General Principle:**
   - Always ensure the working directory is set to the appropriate subdirectory (`client` for frontend, `backend` for backend) before running any project-specific commands.
+  - Always read the instructions documents for the corresponding directory, before generating or modifying any code. They are located in the `.github/instructions/` directory.
+

@@ -1,5 +1,5 @@
 ---
-applyTo: 'client'
+applyTo: 'client/'
 ---
 
 # Frontend Testing Instructions
@@ -31,7 +31,7 @@ applyTo: 'client'
 ### Test Structure
 - Group related tests with `describe` blocks
 - Use clear, descriptive test names
-- Each test should focus on one specific behavior
+- Each test should focus on one specific behavior, prefer one expectation per `it` block
 - Keep tests focused and easy to read
 
 ### User Interactions
@@ -43,9 +43,32 @@ applyTo: 'client'
 - Mock external dependencies and services
 - Always mock fetch requests
 
+### Router-aware Components
+- Use the `renderWithRouter` utility from `utils/testUtils` when a component relies on React Router (e.g., `Link`, `NavLink`, `useNavigate`, `useParams`). This ensures the component is wrapped in a router context during tests.
+- Example:
+  ```tsx
+  import { renderWithRouter } from 'utils/testUtils';
+  
+  renderWithRouter(<MyComponent />);
+  ```
+
 ### Best Practices
 - Test component behavior and interactions
 - Verify component renders without crashing
 - Test both success and error states
 - Clean up after each test if needed
 - Prefer single quotes
+
+### Types
+- Always use proper TypeScript types for test data and component props. Import shared types from `src/types/`.
+- Avoid `any` and `as any` casts in tests.
+
+### Props pattern in tests
+- Prefer passing component props via a single base object and spread it in render. Override only the fields you need per test. This reduces duplication and keeps tests consistent.
+
+Example:
+```tsx
+const baseProps = { title: 'Hello', disabled: false };
+render(<Button {...baseProps} />);
+render(<Button {...baseProps} disabled />);
+```

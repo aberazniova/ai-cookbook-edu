@@ -1,5 +1,5 @@
 ---
-applyTo: 'backend'
+applyTo: 'backend/'
 ---
 
 # Service object best practices

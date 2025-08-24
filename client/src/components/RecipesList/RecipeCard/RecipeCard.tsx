@@ -1,39 +1,76 @@
-import { Card } from 'flowbite-react';
+import { motion } from 'framer-motion';
+import { Card, Badge } from 'flowbite-react';
+import { FiClock as Clock, FiUsers as Users } from 'react-icons/fi';
+import { TbChefHat as ChefHat } from 'react-icons/tb';
 import { Link } from 'react-router-dom';
-import { FaLeaf } from 'react-icons/fa';
 
 import { type RecipeCard as RecipeCardType } from 'types/recipes';
+import { defaultRecipeImageCompact } from 'utils/defaultRecipeImages';
 
 function RecipeCard({ recipe }: { recipe: RecipeCardType }) {
+  const difficultyColors = {
+    easy: "bg-green-100 text-green-800",
+    medium: "bg-yellow-100 text-yellow-800",
+    hard: "bg-red-100 text-red-800"
+  };
+
   return (
-    <Link to={`/recipes/${recipe.id}`} className="block">
-      <Card
-        key={recipe.id}
-        className={`
-          max-w-sm transform transition-all duration-300 hover:scale-[1.02] hover:shadow-xl bg-white dark:bg-neutral-800 border
-          border-stone-100 dark:border-neutral-700 rounded-2xl overflow-hidden shadow-lg group
-        `}
-      >
-        <div className="h-full flex flex-col justify-start gap-4">
-          {recipe.imageUrl ? (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -5 }}
+      transition={{ duration: 0.3 }}
+      className="h-full"
+    >
+      <Link to={`recipes/${recipe.id}`} className="h-full block">
+        <Card className="overflow-hidden bg-white hover:shadow-xl transition-all duration-300 border-0 shadow-md flex flex-col h-full text-left">
+          <div className="relative h-48 overflow-hidden">
             <img
-              src={recipe.imageUrl}
+              src={recipe.imageUrl || defaultRecipeImageCompact}
               alt={recipe.title || 'Recipe image'}
-              className="rounded-t-2xl object-cover w-full h-48 lg:h-56 transition-transform duration-300 group-hover:scale-105"
+              className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
             />
-          ) : (
-            <div className="flex items-center justify-center w-full h-48 lg:h-56 bg-sage-green-200 rounded-2xl dark:bg-sage-green-800">
-              <FaLeaf className="w-24 h-24 text-sage-green dark:text-sage-green-200" />
+
+            <div className="absolute bottom-3 left-3">
+              <Badge icon={ChefHat} className={`${difficultyColors[recipe.difficulty] || 'bg-gray-100 text-gray-800'} pointer-events-none`}>
+                {recipe.difficulty}
+              </Badge>
             </div>
-          )}
-          <div>
-            <h5 className="text-xl lg:text-2xl font-semibold tracking-tight text-gray-900 dark:text-gray-50 mt-2">
-              {recipe.title}
-            </h5>
           </div>
-        </div>
-      </Card>
-    </Link>
+
+          <div className="p-5 flex-1 flex flex-col">
+            <div className="flex flex-col flex-1 space-y-3 justify-between">
+              <h3 className="font-bold text-lg text-gray-900 leading-tight line-clamp-2">
+                {recipe.title}
+              </h3>
+
+              <p className="text-gray-600 text-sm leading-relaxed line-clamp-3">
+                {recipe.summary || 'No summary available.'}
+              </p>
+
+              <div className="flex items-center gap-4 text-sm text-gray-500 pt-2">
+                <div className="flex items-center gap-1">
+                  <Clock className="w-4 h-4" />
+                  <span>{recipe.cookingTime || 0} min</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Users className="w-4 h-4" />
+                  <span>{recipe.servings || 'N/A'}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="px-5 py-3 bg-gray-50/50 border-t border-gray-100 mt-auto">
+            <div className="flex items-center gap-2 text-xs text-gray-500 w-full">
+              <span className="truncate">By {recipe.createdBy || 'Anonymous'}</span>
+              <span></span>
+              <span className="whitespace-nowrap">{recipe.createdDate}</span>
+            </div>
+          </div>
+        </Card>
+      </Link>
+    </motion.div>
   );
 }
 

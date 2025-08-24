@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
 
+import { FiPlus as Plus } from 'react-icons/fi';
+import { motion, AnimatePresence } from 'framer-motion';
+
 import RecipeCard from 'components/RecipesList/RecipeCard/RecipeCard';
-import LoadingSpinner from 'components/Common/LoadingSpinner/LoadingSpinner';
 import { getRecipesList } from 'utils/recipes';
 import { type RecipeCard as RecipeCardType } from 'types/recipes';
 import { useAlertStore } from 'stores/alertStore';
 import { useAuthStore } from 'stores/authStore';
+import Skeleton from './Skeleton/Skelehon';
 
 function RecipesList() {
   const [recipes, setRecipes] = useState<RecipeCardType[]>([]);
@@ -40,25 +43,42 @@ function RecipesList() {
     fetchRecipes();
   }, [addAlert, user]);
 
+  if (loading) {
+    return (
+      <Skeleton />
+    )
+  }
+
   return (
-    <>
-      {loading ? (
-        <div className="flex items-center justify-center h-full">
-          <LoadingSpinner />
-        </div>
+    <AnimatePresence>
+      {recipes.length === 0 ? (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center py-16"
+        >
+          <div className="w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center bg-sage-green-200">
+            <Plus className="w-12 h-12 text-sage-green" />
+          </div>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            You haven&apos;t created any recipes yet
+          </h3>
+          <p className="text-gray-600">
+            Use the AI assistant to create your first recipe!
+          </p>
+        </motion.div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
-          {recipes.length === 0 && (
-            <div className="flex items-center justify-center h-full">
-              <p className="text-gray-500">No recipes found</p>
-            </div>
-          )}
-          {recipes?.map((recipe) => (
-            <RecipeCard key={recipe.id} recipe={recipe} />
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+        >
+          {recipes.map((recipe, index) => (
+            <RecipeCard recipe={recipe} key={index} />
           ))}
-        </div>
+        </motion.div>
       )}
-    </>
+    </AnimatePresence>
   );
 }
 

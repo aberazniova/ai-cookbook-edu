@@ -8,7 +8,7 @@ import SignUp from 'pages/SignUp/SignUp';
 import WithChat from 'layouts/WithChat';
 import RequireAuth from 'layouts/RequireAuth';
 import BaseLayout from 'layouts/BaseLayout';
-import CommunityRecipes from 'pages/v2/CommunityRecipes';
+import CommunityRecipes from 'pages/CommunityRecipes/CommunityRecipes';
 
 function Router() {
   return (
