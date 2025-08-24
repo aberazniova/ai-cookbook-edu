@@ -1,12 +1,14 @@
 import { FaSpinner as Loader2 } from 'react-icons/fa';
-import { useState } from 'react';
-import { FiSend as Send } from 'react-icons/fi';
+import { useEffect, useState } from 'react';
+import { FiSend as Send, FiMic as Mic } from 'react-icons/fi';
 import { Textarea, Button } from 'flowbite-react';
+import classNames from 'classnames';
 
 import { sendMessage } from 'utils/messages';
 import { useMessagesStore } from 'stores/messagesStore';
 import { useAlertStore } from 'stores/alertStore';
-import VoiceInput from 'components/Chat/MessageInput/VoiceInput/VoiceInput';
+import React from 'react';
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
 function MessageInput() {
   const [message, setMessage] = useState('');
@@ -14,6 +16,22 @@ function MessageInput() {
 
   const addMessage = useMessagesStore((state) => state.addMessage);
   const addAlert = useAlertStore((state) => state.addAlert);
+
+  const {
+    transcript,
+    listening,
+    resetTranscript,
+    browserSupportsSpeechRecognition,
+  } = useSpeechRecognition();
+
+  const startListening = () => {
+    resetTranscript();
+    SpeechRecognition.startListening({ continuous: true, language: 'en-US' });
+  };
+
+  const stopListening = () => {
+    SpeechRecognition.stopListening();
+  };
 
   const handleSendMessage = async () => {
     if (message.trim() === '' || isLoading) return;
@@ -23,6 +41,10 @@ function MessageInput() {
       textContent: message,
       role: 'user',
     });
+
+    if (listening) {
+      SpeechRecognition.stopListening();
+    }
 
     setMessage('');
     setIsLoading(true);
@@ -56,6 +78,20 @@ function MessageInput() {
     }
   };
 
+  const toggleVoiceInput = () => {
+    if (listening) {
+      stopListening();
+    } else {
+      startListening();
+    }
+  };
+
+  useEffect(() => {
+    if (listening) {
+      setMessage(transcript);
+    }
+  }, [listening, transcript]);
+
   return (
     <div className="p-4 border-t border-gray-100 bg-gray-50">
       <div className="flex gap-3">
@@ -69,7 +105,24 @@ function MessageInput() {
           disabled={isLoading}
           rows={1}
         />
-        <VoiceInput disabled={isLoading} onResult={setMessage} />
+        {browserSupportsSpeechRecognition && (
+          <Button
+            type="button"
+            onClick={toggleVoiceInput}
+            disabled={isLoading}
+            className={
+              classNames({
+                'rounded-xl shadow-md hover:shadow-lg transition-all duration-200 px-3 border outline-none focus:ring focus:ring-terracotta-400': true,
+                'text-white animate-pulse bg-terracotta border-terracotta': listening,
+                'text-gray-600 hover:text-gray-800 bg-while': !listening,
+              })
+            }
+            aria-label={listening ? 'Stop voice input' : 'Start voice input'}
+            data-testid="voice-input-button"
+          >
+            {listening ? <Mic className="w-4 h-4 animate-pulse" /> : <Mic className="w-4 h-4" />}
+          </Button>
+        )}
         <Button
           type="button"
           onClick={handleSendMessage}
