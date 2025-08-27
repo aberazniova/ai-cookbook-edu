@@ -9,8 +9,7 @@ module Chatbot
 
       def call
         conversation_turns
-          .limited_for_gemini_api
-          .map(&:payload)
+          .pluck(:payload)
       end
 
       private

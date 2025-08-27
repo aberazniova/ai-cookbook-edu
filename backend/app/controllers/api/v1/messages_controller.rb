@@ -13,7 +13,7 @@ class Api::V1::MessagesController < ApplicationController
   end
 
   def index
-    turns = conversation.conversation_turns.text_messages.limited_for_display
+    turns = conversation.conversation_turns.text_messages
 
     render json: turns, each_serializer: MessageSerializer
   end
