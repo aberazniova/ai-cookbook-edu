@@ -9,10 +9,8 @@ module Chatbot
     end
 
     def call
-      result = process_based_on_function_call_name
-
-      function_call_response = function_call_response(result)
-      create_conversation_turn(function_call_response)
+      @function_call_result = process_based_on_function_call_name
+      create_conversation_turn
 
       Chatbot::GenerateResponse.call(conversation: conversation)
     end
@@ -22,37 +20,43 @@ module Chatbot
     attr_reader :function_call_name, :function_call_args, :conversation
 
     def process_based_on_function_call_name
-      function_class = "Chatbot::FunctionCalls::#{function_call_name.camelize}".safe_constantize
-
-      unless function_class
+      unless function_supported?
         raise StandardError, "Function call not supported: #{function_call_name}"
       end
 
-      function_class.call(**symbolized_arguments, user: conversation.user)
-    rescue StandardError => e
+      function_service.call(**symbolized_arguments, user: conversation.user)
+    rescue StandardError => error
       {
-        "status": "error",
-        "message": e.message
+        status: "error",
+        message: error.message
       }
     end
 
-    def function_call_response(result)
-      {
-        name: function_call_name,
-        response: result
-      }
+    def function_supported?
+      function_service.present?
     end
 
-    def create_conversation_turn(function_call_response)
-      ConversationTurns::CreateFromFunctionResponse.call(
-        function_call_name: function_call_name,
-        function_response_part: function_call_response,
-        conversation: conversation
-      )
+    def function_service
+      "Chatbot::FunctionCalls::#{function_call_name.camelize}".safe_constantize
     end
 
     def symbolized_arguments
       function_call_args.transform_keys(&:to_sym)
+    end
+
+    def create_conversation_turn
+      ConversationTurns::CreateFromFunctionResponse.call(
+        function_call_name: function_call_name,
+        function_response_part: build_function_call_response,
+        conversation: conversation
+      )
+    end
+
+    def build_function_call_response
+      {
+        name: function_call_name,
+        response: @function_call_result
+      }
     end
   end
 end

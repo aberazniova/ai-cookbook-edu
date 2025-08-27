@@ -30,7 +30,7 @@ module Recipes
     end
 
     def recipe_params
-      params.slice(:title, :instructions)
+      params.slice(:title, :instructions, :difficulty, :summary, :cooking_time, :servings)
     end
 
     def authorise_update!

@@ -1,25 +1,20 @@
 module Chatbot
   module FunctionCalls
-    class GetRecipe
-      include Callable
-
+    class GetRecipe < Base
       def initialize(id:, user:)
+        super(user: user)
         @id = id
-        @user = user
       end
 
       def call
         authorise_user!
 
-        {
-          "status": "success",
-          "data": RecipeDetailSerializer.new(recipe).as_json
-        }
+        success_payload(RecipeDetailSerializer.new(recipe).as_json)
       end
 
       private
 
-      attr_reader :id, :user
+      attr_reader :id
 
       def recipe
         Recipe.find(id)

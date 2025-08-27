@@ -16,7 +16,11 @@ module Recipes
     attr_reader :recipe, :ingredients
 
     def create_ingredient(ingredient)
-      recipe.ingredients.create!(name: ingredient)
+      recipe.ingredients.create!(params(ingredient))
+    end
+
+    def params(ingredient)
+      ingredient.with_indifferent_access.slice(:name, :amount, :unit)
     end
   end
 end

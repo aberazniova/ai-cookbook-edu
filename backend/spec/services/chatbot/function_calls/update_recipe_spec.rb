@@ -8,6 +8,10 @@ RSpec.describe Chatbot::FunctionCalls::UpdateRecipe do
       title: new_title,
       ingredients: new_ingredients,
       instructions: new_instructions,
+      difficulty: :easy,
+      summary: "Summary",
+      cooking_time: 10,
+      servings: 4,
       user: user
     )
   end
@@ -16,7 +20,7 @@ RSpec.describe Chatbot::FunctionCalls::UpdateRecipe do
   let(:recipe_id) { recipe.id }
   let!(:old_ingredients) { create_list(:ingredient, 2, recipe: recipe) }
   let(:new_title) { "New Title" }
-  let(:new_ingredients) { ["Salt", "Pepper"] }
+  let(:new_ingredients) { [{ name: "Salt", amount: 1, unit: "tsp" }] }
   let(:new_instructions) { "New instructions" }
 
   it "returns a success status and message" do
@@ -27,11 +31,17 @@ RSpec.describe Chatbot::FunctionCalls::UpdateRecipe do
 
   it "returns the updated recipe detail data" do
     result = call
+    recipe.reload
     expect(result[:data]).to eq({
       id: recipe.id,
-      title: new_title,
-      ingredients: new_ingredients,
-      instructions: new_instructions
+      title: recipe.title,
+      instructions: recipe.instructions,
+      ingredients: recipe.ingredients.map { |ingredient| { name: ingredient.name, amount: ingredient.amount.to_s, unit: ingredient.unit } },
+      difficulty: recipe.difficulty,
+      summary: recipe.summary,
+      cooking_time: recipe.cooking_time,
+      servings: recipe.servings,
+      image_url: nil
     })
   end
 

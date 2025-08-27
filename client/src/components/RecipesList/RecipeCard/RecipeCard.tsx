@@ -62,7 +62,7 @@ function RecipeCard({ recipe }: { recipe: RecipeCardType }) {
           </div>
 
           <div className="px-5 py-3 bg-gray-50/50 border-t border-gray-100 mt-auto">
-            <div className="flex items-center gap-2 text-xs text-gray-500 w-full">
+            <div className="flex items-center justify-between gap-2 text-xs text-gray-500 w-full">
               <span className="truncate">By {recipe.createdBy || 'Anonymous'}</span>
               <span></span>
               <span className="whitespace-nowrap">{recipe.createdDate}</span>

@@ -10,22 +10,10 @@ RSpec.describe Chatbot::FunctionCalls::GetRecipe do
     context "when the recipe exists" do
       let(:recipe) { create(:recipe, :with_ingredients, user: user) }
       let(:recipe_id) { recipe.id }
-      let(:recipe_detail) do
-        {
-          id: recipe.id,
-          title: recipe.title,
-          instructions: recipe.instructions,
-          ingredients: recipe.ingredients.map(&:name)
-        }
-      end
+      let(:recipe_detail) { RecipeDetailSerializer.new(recipe).as_json }
 
       it "returns a success status and the recipe data" do
-        expect(call).to eq(
-                {
-                  "status": "success",
-                  "data": recipe_detail
-                }
-              )
+        expect(call).to eq({ status: "success", data: recipe_detail })
       end
     end
 

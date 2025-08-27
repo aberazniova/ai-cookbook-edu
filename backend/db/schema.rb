@@ -33,6 +33,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_17_000002) do
     t.datetime "updated_at", null: false
     t.string "name", null: false
     t.bigint "recipe_id", null: false
+    t.decimal "amount", precision: 10, scale: 2
+    t.string "unit"
     t.index ["recipe_id"], name: "index_ingredients_on_recipe_id"
   end
 
@@ -42,6 +44,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_17_000002) do
     t.string "title", null: false
     t.text "instructions", null: false
     t.bigint "user_id", null: false
+    t.integer "difficulty", default: 1, null: false
+    t.string "summary"
+    t.integer "cooking_time"
+    t.integer "servings", limit: 2
     t.index ["user_id"], name: "index_recipes_on_user_id"
   end
 

@@ -47,13 +47,16 @@ RSpec.describe "Recipes API", type: :request do
         it "returns recipes with correct attributes" do
           do_request
 
-          expected_payload = {
-            "id" => recipe3.id,
-            "title" => recipe3.title
-          }
-
-          recipe_data = json_response.first
-          expect(recipe_data).to eq(expected_payload)
+          expect(json_response.first.keys).to include(
+            "id",
+            "title",
+            "difficulty",
+            "summary",
+            "cooking_time",
+            "servings",
+            "created_by",
+            "created_date"
+          )
         end
 
         it "does not return recipes owned by other users" do
@@ -88,11 +91,20 @@ RSpec.describe "Recipes API", type: :request do
         it "returns the recipe with the correct attributes" do
           do_request
 
+          expected_ingredients = recipe.ingredients.map do |ingredient|
+            { "name" => ingredient.name, "amount" => ingredient.amount.to_s, "unit" => ingredient.unit }
+          end
+
           expected_payload = {
             "id" => recipe.id,
             "title" => recipe.title,
             "instructions" => recipe.instructions,
-            "ingredients" => recipe.ingredients.map(&:name)
+            "ingredients" => expected_ingredients,
+            "difficulty" => recipe.difficulty,
+            "summary" => recipe.summary,
+            "cooking_time" => recipe.cooking_time,
+            "servings" => recipe.servings,
+            "image_url" => nil
           }
 
           expect(json_response).to eq(expected_payload)

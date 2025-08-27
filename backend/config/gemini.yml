@@ -19,6 +19,14 @@ system_instruction:
         and easy to understand. Highlight important information and use emojis to make the instructions
         more engaging, unless the user specifically asks for a different format.
 
+        When creating a recipe, if the user does not provide certain fields — such as servings, cooking time, difficulty, or
+        summary — use your best judgment to fill in these details yourself. Do not ask the user to supply a summary; instead,
+        generate a concise summary of the recipe based on the provided information.
+
+        When updating the recipe, you can also use your best judgment to fill in any missing details, but avoid making assumptions
+        about the user's intent. Always prioritize the information provided by the user. Also when updating the recipe make sure
+        to update the summary if necessary.
+
         Never include IDs when responding to the user, instead refer to recipes by their titles.
 
 tools:
@@ -26,8 +34,8 @@ tools:
     - name: create_recipe
       description: |
         Saves a new cooking recipe to the application's database.
-        It takes the recipe's title, a list of ingredients, and
-        detailed cooking instructions.
+        It takes the recipe's title, a list of ingredients, detailed cooking
+        instructions, difficulty, summary, cooking_time, and servings.
       parameters:
         type: OBJECT
         properties:
@@ -36,19 +44,49 @@ tools:
             description: The title of the recipe, for example, 'Classic Borscht'.
           ingredients:
             type: array
-            description: A list of ingredients as an array of strings, for instance, ['500g meat', '2 beets', '3 potatoes'].
+            description: |
+              A list of ingredients.
             items:
-              type: string
+              type: OBJECT
+              properties:
+                name:
+                  type: string
+                  description: The ingredient name, e.g., 'beets'.
+                amount:
+                  type: number
+                  description: The quantity amount (optional, decimal supported). If provided, you must also include 'unit'.
+                unit:
+                  type: string
+                  description: The measurement unit, e.g., 'g', 'ml', 'pcs' (optional). If provided, you must also include 'amount'.
+              required:
+                - name
           instructions:
             type: string
             description: |
               Step-by-step instructions for preparing the recipe. Optionally, you can
               include Markdown formatting for clarity (e.g., **bold**, *italics*, bullet
               points, numbered lists).
+          difficulty:
+            type: string
+            enum: [easy, medium, hard]
+            description: Difficulty level of the recipe.
+          summary:
+            type: string
+            description: Short summary/description of the recipe.
+          cooking_time:
+            type: integer
+            description: Cooking time in minutes.
+          servings:
+            type: integer
+            description: Number of servings.
         required:
           - title
           - ingredients
           - instructions
+          - difficulty
+          - summary
+          - cooking_time
+          - servings
     - name: update_recipe
       description: |
         Updates an existing recipe in the database by its ID. When updating, make sure the list of ingredients and
@@ -69,10 +107,35 @@ tools:
               The new list of ingredients. If you pass this parameter, make sure to provide the
               full final list of ingredients.
             items:
-              type: string
+              type: OBJECT
+              properties:
+                name:
+                  type: string
+                  description: The ingredient name, e.g., 'beets'.
+                amount:
+                  type: number
+                  description: The quantity amount (optional, decimal supported). If provided, you must also include 'unit'.
+                unit:
+                  type: string
+                  description: The measurement unit, e.g., 'g', 'ml', 'pcs' (optional). If provided, you must also include 'amount'.
+              required:
+                - name
           instructions:
             type: string
             description: The new cooking instructions.
+          difficulty:
+            type: string
+            enum: [easy, medium, hard]
+            description: Updated difficulty level.
+          summary:
+            type: string
+            description: Updated short summary.
+          cooking_time:
+            type: integer
+            description: Updated cooking time in minutes.
+          servings:
+            type: integer
+            description: Updated number of servings.
         required:
           - id
     - name: get_recipe

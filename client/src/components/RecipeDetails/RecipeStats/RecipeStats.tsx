@@ -15,8 +15,11 @@ type Props = {
 
 function RecipeStats({ cookingTime, servings, difficulty, onServingsChanged }: Props) {
   const decrementServingsDisabled = servings <= 1;
+  const incrementServingsDisabled = servings >= 99;
 
   const incrementServings = () => {
+    if (incrementServingsDisabled) return;
+
     onServingsChanged(servings + 1);
   };
 
@@ -55,6 +58,7 @@ function RecipeStats({ cookingTime, servings, difficulty, onServingsChanged }: P
             type="button"
             className="w-6 h-6 flex items-center justify-center"
             onClick={incrementServings}
+            disabled={incrementServingsDisabled}
             data-testid="recipe-stats-increment-button"
           >
             <Plus className="w-3 h-3" />

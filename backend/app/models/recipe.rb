@@ -18,4 +18,10 @@ class Recipe < ApplicationRecord
   belongs_to :user
 
   has_many :ingredients, dependent: :destroy
+
+  enum :difficulty, {
+    easy: 0,
+    medium: 1,
+    hard: 2
+  }
 end

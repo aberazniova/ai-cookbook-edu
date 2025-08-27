@@ -19,13 +19,13 @@ RSpec.describe Recipes::UpdateRecipe do
   end
 
   context "when ingredients are provided" do
-    let(:new_ingredients) { ["Salt", "Pepper"] }
+    let(:new_ingredients) { [{ name: "Salt", amount: 1, unit: "tsp" }, { name: "Pepper", amount: 2, unit: "tbsp" }] }
     let(:params) { { ingredients: new_ingredients } }
 
     it "replaces the recipe's ingredients with a new list" do
       call
       recipe.reload
-      expect(recipe.ingredients.pluck(:name)).to match_array(new_ingredients)
+      expect(recipe.ingredients.pluck(:name)).to match_array(["Salt", "Pepper"])
     end
   end
 

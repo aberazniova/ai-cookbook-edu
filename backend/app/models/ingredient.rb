@@ -7,6 +7,8 @@
 #  updated_at :datetime         not null
 #  name       :string(255)      not null
 #  recipe_id  :integer          not null
+#  amount     :decimal(10, 2)
+#  unit       :string(255)
 #
 # Indexes
 #
@@ -15,4 +17,7 @@
 
 class Ingredient < ApplicationRecord
   belongs_to :recipe
+
+  validates :unit, presence: true, if: -> { amount.present? }
+  validates :amount, presence: true, if: -> { unit.present? }
 end

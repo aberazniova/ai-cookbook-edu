@@ -10,8 +10,8 @@ module Chatbot
 
       def call
         {
-          "role": role,
-          "parts": parts
+          role: role,
+          parts: parts
         }
       end
 

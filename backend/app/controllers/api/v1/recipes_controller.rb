@@ -3,7 +3,7 @@ class Api::V1::RecipesController < ApplicationController
 
   def index
     @recipes = user_recipes.order(created_at: :desc)
-    render json: @recipes, each_serializer: RecipeSerializer
+    render json: @recipes, each_serializer: RecipeCardSerializer
   end
 
   def show
