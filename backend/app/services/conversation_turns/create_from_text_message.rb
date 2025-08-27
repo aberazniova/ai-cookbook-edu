@@ -1,10 +1,11 @@
 module ConversationTurns
-  class CreateFromUserMessage
+  class CreateFromTextMessage
     include Callable
 
-    def initialize(message_content:, conversation:)
+    def initialize(message_content:, conversation:, role:)
       @message_content = message_content
       @conversation = conversation
+      @role = role
     end
 
     def call
@@ -18,10 +19,6 @@ module ConversationTurns
 
     private
 
-    attr_reader :message_content, :conversation
-
-    def role
-      :user
-    end
+    attr_reader :message_content, :conversation, :role
   end
 end

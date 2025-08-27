@@ -24,7 +24,7 @@ class Api::V1::MessagesController < ApplicationController
     @_conversation ||= begin
       return current_conversation if current_conversation.present?
 
-      new_conversation = current_user.conversations.create!
+      new_conversation = Conversations::Create.call(user: current_user, with_initial_message: true)
       cookies.encrypted[:conversation_id] = {
         value: new_conversation.id,
         httponly: true,

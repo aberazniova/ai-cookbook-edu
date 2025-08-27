@@ -9,7 +9,7 @@ RSpec.describe Chatbot::ProcessUserMessage do
     let(:gemini_response) { "I'm doing well, thank you for asking!" }
 
     before do
-      allow(ConversationTurns::CreateFromUserMessage).to receive(:call)
+      allow(ConversationTurns::CreateFromTextMessage).to receive(:call)
       allow(Chatbot::GenerateResponse).to receive(:call).and_return(gemini_response)
     end
 
@@ -24,9 +24,10 @@ RSpec.describe Chatbot::ProcessUserMessage do
     it "creates a conversation turn for the user message" do
       call
 
-      expect(ConversationTurns::CreateFromUserMessage).to have_received(:call).with(
+      expect(ConversationTurns::CreateFromTextMessage).to have_received(:call).with(
         message_content: message_content,
-        conversation: conversation
+        conversation: conversation,
+        role: :user
       )
     end
 

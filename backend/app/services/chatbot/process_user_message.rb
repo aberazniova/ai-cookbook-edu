@@ -25,9 +25,10 @@ module Chatbot
     attr_reader :message_content, :conversation
 
     def create_conversation_turn
-      ConversationTurns::CreateFromUserMessage.call(
+      ConversationTurns::CreateFromTextMessage.call(
         message_content: message_content,
-        conversation: conversation
+        conversation: conversation,
+        role: :user
       )
     end
   end

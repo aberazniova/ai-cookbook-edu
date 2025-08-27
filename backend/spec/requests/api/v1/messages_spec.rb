@@ -33,9 +33,11 @@ RSpec.describe "Messages API", type: :request do
           expect(response).to have_http_status(:ok)
         end
 
-        it "returns an empty array" do
+        it "returns an initial model message" do
           do_request
-          expect(json_response).to eq([])
+
+          expect(json_response[0]["text_content"]).to eq(Conversations::Create::INITIAL_MESSAGE_FROM_MODEL)
+          expect(json_response[0]["role"]).to eq("model")
         end
       end
 
