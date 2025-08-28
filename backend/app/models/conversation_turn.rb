@@ -13,6 +13,7 @@
 # Indexes
 #
 #  index_conversation_turns_on_conversation_id  (conversation_id)
+#  index_conversation_turns_timeline            (conversation_id,created_at,id)
 #
 
 class ConversationTurn < ApplicationRecord

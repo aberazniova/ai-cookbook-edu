@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_17_000002) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_28_121000) do
   create_table "conversation_turns", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "conversation_id", null: false
     t.integer "role", null: false
@@ -18,6 +18,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_17_000002) do
     t.json "payload", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["conversation_id", "created_at", "id"], name: "index_conversation_turns_timeline"
     t.index ["conversation_id"], name: "index_conversation_turns_on_conversation_id"
   end
 
