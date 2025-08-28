@@ -25,7 +25,6 @@ RSpec.describe Chatbot::GenerateResponse do
     before do
       allow(Chatbot::BuildPayload::ConversationHistory).to receive(:call).and_return(conversation_contents)
       allow(ExternalApi::GoogleGemini).to receive(:generate_content).and_return(api_response)
-      allow(ConversationTurns::CreateFromGeminiApiResponse).to receive(:call)
     end
 
     it "calls Chatbot::BuildPayload::ConversationHistory with the conversation" do
@@ -43,12 +42,7 @@ RSpec.describe Chatbot::GenerateResponse do
     end
 
     it "saves the response turn" do
-      call
-
-      expect(ConversationTurns::CreateFromGeminiApiResponse).to have_received(:call).with(
-        api_response: api_response,
-        conversation: conversation
-      )
+      expect { call }.to change(ConversationTurn, :count).by(1)
     end
 
     context "when the API response contains a text response" do

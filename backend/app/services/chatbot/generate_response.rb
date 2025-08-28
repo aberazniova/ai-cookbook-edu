@@ -7,9 +7,9 @@ module Chatbot
     end
 
     def call
-      return nil unless response_content.present?
+      return nil if parts.empty?
 
-      save_response_turn
+      response_turn = save_response_turn
 
       if function_call.present?
         Chatbot::ProcessFunctionCall.call(
@@ -18,7 +18,7 @@ module Chatbot
           conversation: conversation
         )
       else
-        response_content.dig("text")
+        response_turn.text_content
       end
     end
 
@@ -33,16 +33,20 @@ module Chatbot
     def function_call
       return @_function_call if defined?(@_function_call)
 
-      @_function_call = response_content.dig("functionCall")
+      @_function_call = parts.filter_map { |p| p["functionCall"] }.first
+    end
+
+    def parts
+      @_parts ||= response_content&.dig("parts") || []
     end
 
     def response_content
-      @_response_content ||= api_response.dig("candidates", 0, "content", "parts", 0)
+      @_response_content ||= api_response.dig("candidates", 0, "content")
     end
 
     def save_response_turn
-      ConversationTurns::CreateFromGeminiApiResponse.call(
-        api_response: api_response,
+      ConversationTurns::CreateFromResponsePayload.call(
+        response_payload: response_content,
         conversation: conversation
       )
     end

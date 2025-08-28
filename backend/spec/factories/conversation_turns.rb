@@ -18,6 +18,19 @@ FactoryBot.define do
       payload { { "parts" => [{ "text" => text_content }] } }
     end
 
+    trait :multi_part_model_response do
+      role { :model }
+      text_content { [Faker::Lorem.sentence, Faker::Lorem.sentence].join("\n\n") }
+      payload do
+        {
+          "parts" => [
+            { "text" => text_content.split("\n\n").first },
+            { "text" => text_content.split("\n\n").last }
+          ]
+        }
+      end
+    end
+
     trait :with_function_call do
       role { :model }
       text_content { nil }
@@ -33,6 +46,19 @@ FactoryBot.define do
                 }
               }
             }
+          ]
+        }
+      end
+    end
+
+    trait :function_and_text do
+      role { :model }
+      text_content { "Some reply" }
+      payload do
+        {
+          "parts" => [
+            { "text" => text_content },
+            { "functionCall" => { "name" => "create_recipe", "args" => { "title" => "T" } } }
           ]
         }
       end

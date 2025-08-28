@@ -17,7 +17,7 @@ module Chatbot
       attr_reader :conversation
 
       def conversation_turns
-        conversation.conversation_turns
+        conversation.conversation_turns.order(:created_at)
       end
     end
   end

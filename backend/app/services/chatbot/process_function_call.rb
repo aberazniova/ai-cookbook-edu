@@ -26,6 +26,8 @@ module Chatbot
 
       function_service.call(**symbolized_arguments, user: conversation.user)
     rescue StandardError => error
+      Rails.logger.error("Error processing function call #{function_call_name}: #{error.message}")
+
       {
         status: "error",
         message: error.message
