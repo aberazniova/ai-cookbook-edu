@@ -2,7 +2,7 @@ module Chatbot
   class ProcessUserMessage
     include Callable
 
-    Result = Struct.new(:success?, :response_message, :error)
+    Result = Struct.new(:success?, :messages, :error)
 
     def initialize(message_content:, conversation:)
       @message_content = message_content
@@ -10,11 +10,11 @@ module Chatbot
     end
 
     def call
-      create_conversation_turn
+      @user_message_turn = create_conversation_turn
 
-      gemini_response = Chatbot::GenerateResponse.call(conversation: conversation)
+      Chatbot::GenerateResponse.call(conversation: conversation)
 
-      Result.new(true, gemini_response, nil)
+      Result.new(true, new_messages, nil)
     rescue StandardError => e
       Rails.logger.error("Error generating chatbot response: #{e.message}")
       Result.new(false, nil, e.message)
@@ -30,6 +30,10 @@ module Chatbot
         conversation: conversation,
         role: :user
       )
+    end
+
+    def new_messages
+      conversation.conversation_turns.displayable.where("id > ?", @user_message_turn.id)
     end
   end
 end

@@ -11,6 +11,7 @@ import { FaRobot as Bot, FaSpinner as Loader2 } from 'react-icons/fa';
 
 function MessageList() {
   const messages = useMessagesStore((state) => state.messages);
+  const responseLoading = useMessagesStore((state) => state.responseLoading);
   const setMessages = useMessagesStore((state) => state.setMessages);
   const addAlert = useAlertStore((state) => state.addAlert);
   const user = useAuthStore((state) => state.user);
@@ -57,13 +58,18 @@ function MessageList() {
 
   return (
     <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      {isLoading && (
+        <div className="flex items-center justify-center">
+          <Loader2 className="w-6 h-6 animate-spin" />
+        </div>
+      )}
       <AnimatePresence>
         {messages.map((message) => (
           <Message key={message.id} message={message} />
         ))}
       </AnimatePresence>
       {
-        isLoading && (
+        responseLoading && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

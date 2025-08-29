@@ -3,7 +3,7 @@ import { authFetch } from 'utils/authFetch';
 import { Message } from 'types/messages';
 import camelcaseKeys from 'camelcase-keys';
 
-export const sendMessage = async (message: string): Promise<string> => {
+export const sendMessage = async (message: string): Promise<Message[]> => {
   const response = await authFetch(`${apiBaseUrl}/messages`, {
     method: 'POST',
     body: JSON.stringify({ message }),
@@ -15,7 +15,7 @@ export const sendMessage = async (message: string): Promise<string> => {
     throw new Error(`Error processing message! ${data.message || `status: ${response.status}`}`);
   }
 
-  return data.message;
+  return camelcaseKeys(data);
 };
 
 export const getMessages = async (): Promise<Message[]> => {

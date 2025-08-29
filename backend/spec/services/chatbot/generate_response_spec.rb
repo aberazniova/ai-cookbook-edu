@@ -46,8 +46,14 @@ RSpec.describe Chatbot::GenerateResponse do
     end
 
     context "when the API response contains a text response" do
-      it "returns the text response from the API" do
-        expect(call).to eq("Hello! How can I help you today?")
+      it "creates a conversation turn with the text response" do
+        call
+
+        expect(ConversationTurn.last).to have_attributes(
+          role: "model",
+          text_content: "Hello! How can I help you today?",
+          conversation: conversation
+        )
       end
     end
 
@@ -93,10 +99,6 @@ RSpec.describe Chatbot::GenerateResponse do
           conversation: conversation
         )
       end
-
-      it "returns the result of the function call" do
-        expect(call).to eq(function_call_result)
-      end
     end
 
     context "when no response content is received" do
@@ -112,8 +114,8 @@ RSpec.describe Chatbot::GenerateResponse do
         }
       end
 
-      it "returns nil" do
-        expect(call).to be_nil
+      it "does not create any conversation turns" do
+        expect { call }.not_to change(ConversationTurn, :count)
       end
     end
 

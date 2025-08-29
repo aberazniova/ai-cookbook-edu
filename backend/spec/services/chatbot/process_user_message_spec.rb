@@ -6,18 +6,21 @@ RSpec.describe Chatbot::ProcessUserMessage do
 
     let(:message_content) { "Hello, how are you?" }
     let(:conversation) { create(:conversation) }
-    let(:gemini_response) { "I'm doing well, thank you for asking!" }
+    let(:response_messages) { create_list(:conversation_turn, 2, :model, conversation: conversation) }
+
+    let(:user_message_turn) { build_stubbed(:conversation_turn, :user_message, conversation: conversation) }
 
     before do
-      allow(ConversationTurns::CreateFromTextMessage).to receive(:call)
-      allow(Chatbot::GenerateResponse).to receive(:call).and_return(gemini_response)
+      allow(ConversationTurns::CreateFromTextMessage).to receive(:call).and_return(user_message_turn)
+      allow(Chatbot::GenerateResponse).to receive(:call)
+      allow(conversation).to receive_message_chain(:conversation_turns, :displayable, :where).and_return(response_messages)
     end
 
-    it "returns a successful result with the gemini response" do
+    it "returns a successful result with the response messages" do
       result = call
 
       expect(result.success?).to be true
-      expect(result.response_message).to eq(gemini_response)
+      expect(result.messages).to eq(response_messages)
       expect(result.error).to be_nil
     end
 
@@ -49,7 +52,7 @@ RSpec.describe Chatbot::ProcessUserMessage do
         result = call
 
         expect(result.success?).to be false
-        expect(result.response_message).to be_nil
+        expect(result.messages).to be_nil
         expect(result.error).to eq("API Error")
       end
 

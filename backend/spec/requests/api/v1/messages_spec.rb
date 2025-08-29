@@ -131,10 +131,11 @@ RSpec.describe "Messages API", type: :request do
     context "with valid access token" do
       let(:user) { create(:user) }
       let(:headers) { Devise::JWT::TestHelpers.auth_headers({ "Accept" => "application/json" }, user) }
+      let(:response_messages) { create_list(:conversation_turn, 2, :model) }
 
       before do
         allow(Chatbot::ProcessUserMessage).to receive(:call).and_return(
-          Struct.new(:success?, :response_message, :error).new(true, "Stubbed response message", nil)
+          Struct.new(:success?, :messages, :error).new(true, response_messages, nil)
         )
       end
 
@@ -144,9 +145,20 @@ RSpec.describe "Messages API", type: :request do
           expect(response).to have_http_status(:ok)
         end
 
-        it "returns a response message" do
+        it "returns all response messages" do
           post "/api/v1/messages", params: params, headers: headers
-          expect(response.body).to include("Stubbed response message")
+          expect(json_response.count).to eq(response_messages.count)
+        end
+
+        it "returns correct attributes for each message" do
+          post "/api/v1/messages", params: params, headers: headers
+          response_messages.each_with_index do |msg, index|
+            expect(json_response[index]).to include(
+              "id" => msg.id,
+              "text_content" => msg.text_content,
+              "role" => msg.role
+            )
+          end
         end
 
         context "when conversation id cookie is present" do

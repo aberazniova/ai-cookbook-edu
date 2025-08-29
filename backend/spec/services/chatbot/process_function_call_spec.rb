@@ -9,12 +9,11 @@ RSpec.describe Chatbot::ProcessFunctionCall do
     let(:user) { create(:user) }
     let(:conversation) { create(:conversation, user: user) }
     let(:function_result) { { "status" => "success", "message" => "Recipe saved successfully" } }
-    let(:gemini_response) { "Recipe created successfully!" }
 
     before do
       allow(Chatbot::FunctionCalls::CreateRecipe).to receive(:call).and_return(function_result)
       allow(ConversationTurns::CreateFromFunctionResponse).to receive(:call)
-      allow(Chatbot::GenerateResponse).to receive(:call).and_return(gemini_response)
+      allow(Chatbot::GenerateResponse).to receive(:call)
     end
 
     it "creates a conversation turn with the function response" do
@@ -38,10 +37,6 @@ RSpec.describe Chatbot::ProcessFunctionCall do
       expect(Chatbot::GenerateResponse).to have_received(:call).with(
         conversation: conversation
       )
-    end
-
-    it "returns the gemini response" do
-      expect(call).to eq(gemini_response)
     end
 
     [

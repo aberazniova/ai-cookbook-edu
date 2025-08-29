@@ -6,14 +6,14 @@ class Api::V1::MessagesController < ApplicationController
     result = Chatbot::ProcessUserMessage.call(message_content: user_message, conversation: conversation)
 
     if result.success?
-      render json: { message: result.response_message }
+      render json: result.messages, each_serializer: MessageSerializer
     else
       render json: { message: result.error }, status: :bad_request
     end
   end
 
   def index
-    turns = conversation.conversation_turns.text_messages
+    turns = conversation.conversation_turns.displayable
 
     render json: turns, each_serializer: MessageSerializer
   end

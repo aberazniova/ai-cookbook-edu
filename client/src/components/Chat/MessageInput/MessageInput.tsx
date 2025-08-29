@@ -11,7 +11,8 @@ import { useAlertStore } from 'stores/alertStore';
 
 function MessageInput() {
   const [message, setMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const setResponseLoading = useMessagesStore((state) => state.setResponseLoading);
+  const responseLoading = useMessagesStore((state) => state.responseLoading);
 
   const addMessage = useMessagesStore((state) => state.addMessage);
   const addAlert = useAlertStore((state) => state.addAlert);
@@ -33,7 +34,7 @@ function MessageInput() {
   };
 
   const handleSendMessage = async () => {
-    if (message.trim() === '' || isLoading) return;
+    if (message.trim() === '' || responseLoading) return;
 
     addMessage({
       id: String(Date.now()),
@@ -46,19 +47,21 @@ function MessageInput() {
     }
 
     setMessage('');
-    setIsLoading(true);
+    setResponseLoading(true);
 
     try {
-      const response = await sendMessage(message);
+      const newMessages = await sendMessage(message);
 
-      if (!response) {
+      if (!newMessages) {
         return;
       }
 
-      addMessage({
-        id: String(Date.now() + 1),
-        textContent: response,
-        role: 'model',
+      newMessages.forEach((newMessage) => {
+        addMessage({
+          id: String(newMessage.id),
+          textContent: newMessage.textContent,
+          role: newMessage.role,
+        });
       });
     } catch (error) {
       addAlert({
@@ -66,7 +69,7 @@ function MessageInput() {
         message: error.message || 'An unexpected error occurred while processing your message.',
       });
     } finally {
-      setIsLoading(false);
+      setResponseLoading(false);
     }
   };
 
@@ -101,14 +104,14 @@ function MessageInput() {
           placeholder="Type your message here..."
           className="flex-1 border-gray-200 bg-white shadow-sm focus:border-gray-200 px-4 py-2 rounded-xl placeholder-gray-500"
           aria-label="Chat input"
-          disabled={isLoading}
+          disabled={responseLoading}
           rows={1}
         />
         {browserSupportsSpeechRecognition && (
           <Button
             type="button"
             onClick={toggleVoiceInput}
-            disabled={isLoading}
+            disabled={responseLoading}
             className={
               classNames({
                 'rounded-xl shadow-md hover:shadow-lg transition-all duration-200 px-3 border outline-none focus:ring focus:ring-terracotta-400': true,
@@ -125,12 +128,12 @@ function MessageInput() {
         <Button
           type="button"
           onClick={handleSendMessage}
-          disabled={!message.trim() || isLoading}
+          disabled={!message.trim() || responseLoading}
           className="rounded-xl text-white shadow-md hover:shadow-lg px-3 bg-terracotta hover:bg-terracotta-700 focus:ring-0"
           aria-label="Send message"
           data-testid="send-button"
         >
-          {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+          {responseLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
         </Button>
       </div>
     </div>

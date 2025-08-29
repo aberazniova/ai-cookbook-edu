@@ -7,7 +7,7 @@ module Chatbot
     end
 
     def call
-      return nil if parts.empty?
+      return if parts.empty?
 
       response_turn = save_response_turn
 
@@ -17,8 +17,6 @@ module Chatbot
           function_call_args: function_call.dig("args"),
           conversation: conversation
         )
-      else
-        response_turn.text_content
       end
     end
 

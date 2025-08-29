@@ -24,5 +24,5 @@ class ConversationTurn < ApplicationRecord
     model: 1
   }, prefix: true
 
-  scope :text_messages, -> { where.not(text_content: nil) }
+  scope :displayable, -> { where.not(text_content: nil) }
 end
