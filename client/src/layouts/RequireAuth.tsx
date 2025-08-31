@@ -6,12 +6,10 @@ import { refreshToken } from 'utils/auth';
 import LoadingSpinner from 'components/Common/LoadingSpinner/LoadingSpinner';
 
 function RequireAuth() {
-  const user = useAuthStore((s) => s.user);
-  const token = useAuthStore((s) => s.token);
+  const { user, token } = useAuthStore();
+  const [verifiedAuth, setVerifiedAuth] = useState(false);
 
   const navigate = useNavigate();
-
-  const [verifiedAuth, setVerifiedAuth] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {

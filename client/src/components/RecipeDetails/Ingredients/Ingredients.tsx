@@ -16,7 +16,7 @@ function Ingredients({ ingredients, displayedServings, originalServings }: Props
 
     return {
       ...ingredient,
-      amount: ingredient.amount * servingMultiplier
+      amount: Number((ingredient.amount * servingMultiplier).toFixed(2))
     }
   });
 

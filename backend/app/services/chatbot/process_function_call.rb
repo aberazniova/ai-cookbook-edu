@@ -2,22 +2,20 @@ module Chatbot
   class ProcessFunctionCall
     include Callable
 
-    def initialize(function_call_name:, function_call_args:, conversation:)
+    def initialize(function_call_name:, function_call_args:)
       @function_call_name = function_call_name
       @function_call_args = function_call_args
-      @conversation = conversation
     end
 
     def call
-      @function_call_result = process_based_on_function_call_name
-      create_conversation_turn
+      process_based_on_function_call_name
 
-      Chatbot::GenerateResponse.call(conversation: conversation)
+      Chatbot::GenerateResponse.call
     end
 
     private
 
-    attr_reader :function_call_name, :function_call_args, :conversation
+    attr_reader :function_call_name, :function_call_args
 
     def process_based_on_function_call_name
       unless function_supported?
@@ -27,11 +25,7 @@ module Chatbot
       function_service.call(**symbolized_arguments, user: conversation.user)
     rescue StandardError => error
       Rails.logger.error("Error processing function call #{function_call_name}: #{error.message}")
-
-      {
-        status: "error",
-        message: error.message
-      }
+      save_failure_function_call_result(error.message)
     end
 
     def function_supported?
@@ -46,19 +40,16 @@ module Chatbot
       function_call_args.transform_keys(&:to_sym)
     end
 
-    def create_conversation_turn
-      ConversationTurns::CreateFromFunctionResponse.call(
+    def save_failure_function_call_result(error_message)
+      Chatbot::SaveFunctionCallResults.call(
         function_call_name: function_call_name,
-        function_response_part: build_function_call_response,
-        conversation: conversation
+        status: "error",
+        message: error_message
       )
     end
 
-    def build_function_call_response
-      {
-        name: function_call_name,
-        response: @function_call_result
-      }
+    def conversation
+      Current.conversation
     end
   end
 end

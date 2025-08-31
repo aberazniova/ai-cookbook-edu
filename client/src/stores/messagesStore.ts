@@ -37,3 +37,5 @@ export const useMessagesStore = create<MessagesStore>(
     }
   }),
 );
+
+export const addMessage = (message: Message) => useMessagesStore.getState().addMessage(message);

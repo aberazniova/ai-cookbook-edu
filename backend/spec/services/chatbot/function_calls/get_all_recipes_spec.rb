@@ -2,16 +2,22 @@ require 'rails_helper'
 
 RSpec.describe Chatbot::FunctionCalls::GetAllRecipes do
   describe '#call' do
-    let(:user) { create(:user) }
     subject(:call) { described_class.call(user: user) }
 
-    context 'when there are no recipes' do
-      it 'returns a success status' do
-        expect(call[:status]).to eq('success')
-      end
+    let(:user) { create(:user) }
 
-      it 'returns an empty data array' do
-        expect(call[:data]).to eq([])
+    before do
+      allow(Chatbot::SaveFunctionCallResults).to receive(:call)
+    end
+
+    context 'when there are no recipes' do
+      it "saves function call results with an empty data array" do
+        expect(Chatbot::SaveFunctionCallResults).to receive(:call).with(
+          function_call_name: "get_all_recipes",
+          response_data: []
+        )
+
+        call
       end
     end
 
@@ -20,29 +26,18 @@ RSpec.describe Chatbot::FunctionCalls::GetAllRecipes do
       let!(:recipe2) { create(:recipe, title: 'Recipe 2', user: user) }
       let!(:other_user_recipe) { create(:recipe, title: 'Other Recipe', user: create(:user)) }
 
-      it 'does not include recipes belonging to other users' do
-        expect(call[:data].map { |r| r[:id] }).not_to include(other_user_recipe.id)
-      end
+      it "saves function call results with user recipes details" do
+        expected_recipes_details = ActiveModelSerializers::SerializableResource.new(
+          [recipe1, recipe2],
+          each_serializer: RecipeDetailSerializer
+        ).as_json
 
-      it 'returns a success status' do
-        expect(call[:status]).to eq('success')
-      end
-
-      it 'returns all recipes' do
-        expect(call[:data].count).to eq(2)
-      end
-
-      it 'returns the detailed attributes for the recipe' do
-        expect(call[:data].first.keys).to include(
-          :id,
-          :title,
-          :ingredients,
-          :instructions,
-          :difficulty,
-          :summary,
-          :cooking_time,
-          :servings
+        expect(Chatbot::SaveFunctionCallResults).to receive(:call).with(
+          function_call_name: "get_all_recipes",
+          response_data: expected_recipes_details
         )
+
+        call
       end
     end
   end

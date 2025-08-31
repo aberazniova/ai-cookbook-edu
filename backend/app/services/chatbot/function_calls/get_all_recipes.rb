@@ -1,15 +1,22 @@
 module Chatbot
   module FunctionCalls
-    class GetAllRecipes < Base
+    class GetAllRecipes
+      include Callable
+
       def initialize(user:)
-        super
+        @user = user
       end
 
       def call
-        success_payload(recipes_data)
+        Chatbot::SaveFunctionCallResults.call(
+          function_call_name: "get_all_recipes",
+          response_data: recipes_data,
+        )
       end
 
       private
+
+      attr_reader :user
 
       def recipes_data
         ActiveModelSerializers::SerializableResource.new(

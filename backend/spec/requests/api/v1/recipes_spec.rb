@@ -104,7 +104,9 @@ RSpec.describe "Recipes API", type: :request do
             "summary" => recipe.summary,
             "cooking_time" => recipe.cooking_time,
             "servings" => recipe.servings,
-            "image_url" => nil
+            "image_url" => nil,
+            "created_by" => recipe.user&.email,
+            "created_date" => recipe.created_at.strftime("%B %d, %Y")
           }
 
           expect(json_response).to eq(expected_payload)

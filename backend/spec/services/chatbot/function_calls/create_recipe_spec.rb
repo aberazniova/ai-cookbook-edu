@@ -2,7 +2,6 @@ require "rails_helper"
 
 RSpec.describe Chatbot::FunctionCalls::CreateRecipe do
   describe "#call" do
-    let(:user) { create(:user) }
     subject(:call) do
       described_class.call(
         title: title,
@@ -16,8 +15,9 @@ RSpec.describe Chatbot::FunctionCalls::CreateRecipe do
       )
     end
 
+    let(:user) { create(:user) }
     let(:title) { "Test Recipe" }
-    let(:ingredients) { [{ name: "Ingredient 2", amount: 2, unit: "pcs" }] }
+    let(:ingredients) { [{ name: "Ingredient 1", amount: 2, unit: "pcs" }] }
     let(:instructions) { "Test instructions" }
 
     let(:expected_params) do
@@ -33,30 +33,38 @@ RSpec.describe Chatbot::FunctionCalls::CreateRecipe do
     end
 
     before do
-      allow(Recipes::CreateRecipe).to receive(:call).and_call_original
+      allow(Chatbot::SaveFunctionCallResults).to receive(:call)
     end
 
-    it "calls Recipes::CreateRecipe with correct parameters" do
-      expect(Recipes::CreateRecipe).to receive(:call).with(
-        user: user,
-        params: expected_params
-      )
-      call
-    end
-
-    it "creates a recipe" do
+    it "creates a new recipe" do
       expect { call }.to change { Recipe.count }.by(1)
     end
 
-    it "returns success response with recipe data" do
-      result = call
+    it "creates a recipe with the correct arguments" do
+      call
+
+      recipe = Recipe.last
+      expect(recipe.title).to eq(title)
+      expect(recipe.ingredients.pluck(:name)).to eq(["Ingredient 1"])
+      expect(recipe.instructions).to eq(instructions)
+      expect(recipe.difficulty).to eq("easy")
+      expect(recipe.summary).to eq("Summary")
+      expect(recipe.cooking_time).to eq(10)
+      expect(recipe.servings).to eq(4)
+    end
+
+    it "saves the function call results" do
+      call
+
       recipe = Recipe.last
 
-      expect(result).to eq({
-        status: "success",
+      expect(Chatbot::SaveFunctionCallResults).to have_received(:call).with(
+        function_call_name: "create_recipe",
+        response_data: RecipeCompactSerializer.new(recipe).as_json,
         message: "Recipe created successfully",
-        data: RecipeDetailSerializer.new(recipe).as_json
-      })
+        artifact_kind: "recipe_created",
+        artifact_data: RecipeCardSerializer.new(recipe).as_json
+      )
     end
   end
 end

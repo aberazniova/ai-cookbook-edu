@@ -1,9 +1,10 @@
 module Chatbot
   module FunctionCalls
-    class CreateRecipe < Base
-      def initialize(title:, ingredients:, instructions:, user:, difficulty: nil, summary: nil, cooking_time: nil, servings: nil)
-        super(user: user)
+    class CreateRecipe
+      include Callable
 
+      def initialize(title:, ingredients:, instructions:, user:, difficulty: nil, summary: nil, cooking_time: nil, servings: nil)
+        @user = user
         @params = {
           title: title,
           ingredients: ingredients,
@@ -18,15 +19,18 @@ module Chatbot
       def call
         recipe = Recipes::CreateRecipe.call(user: user, params: params)
 
-        success_payload(
-          RecipeDetailSerializer.new(recipe).as_json,
-          message: "Recipe created successfully"
+        Chatbot::SaveFunctionCallResults.call(
+          function_call_name: "create_recipe",
+          message: "Recipe created successfully",
+          response_data: RecipeCompactSerializer.new(recipe).as_json,
+          artifact_kind: "recipe_created",
+          artifact_data: RecipeCardSerializer.new(recipe).as_json
         )
       end
 
       private
 
-      attr_reader :params
+      attr_reader :params, :user
     end
   end
 end

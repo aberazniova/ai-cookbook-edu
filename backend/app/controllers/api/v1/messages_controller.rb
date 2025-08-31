@@ -1,12 +1,17 @@
+
 class Api::V1::MessagesController < ApplicationController
   before_action :authenticate_user!
   before_action :validate_user_message!, only: :create
+  before_action :set_conversation_to_current, only: :create
 
   def create
-    result = Chatbot::ProcessUserMessage.call(message_content: user_message, conversation: conversation)
+    result = Chatbot::ProcessUserMessage.call(message_content: user_message)
 
     if result.success?
-      render json: result.messages, each_serializer: MessageSerializer
+      render json: {
+        messages: ActiveModelSerializers::SerializableResource.new(result.messages, each_serializer: MessageSerializer),
+        artifacts: result.artifacts.as_json
+      }
     else
       render json: { message: result.error }, status: :bad_request
     end
@@ -54,5 +59,9 @@ class Api::V1::MessagesController < ApplicationController
     return if user_message.present?
 
     render json: { message: "Message must be present." }, status: :bad_request
+  end
+
+  def set_conversation_to_current
+    Current.conversation = conversation
   end
 end

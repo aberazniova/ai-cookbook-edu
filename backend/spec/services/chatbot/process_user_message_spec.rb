@@ -2,15 +2,15 @@ require "rails_helper"
 
 RSpec.describe Chatbot::ProcessUserMessage do
   describe "#call" do
-    subject(:call) { described_class.call(message_content: message_content, conversation: conversation) }
+    subject(:call) { described_class.call(message_content: message_content) }
 
     let(:message_content) { "Hello, how are you?" }
     let(:conversation) { create(:conversation) }
-    let(:response_messages) { create_list(:conversation_turn, 2, :model, conversation: conversation) }
-
+    let(:response_messages) { build_list(:conversation_turn, 2, :model, conversation: conversation) }
     let(:user_message_turn) { build_stubbed(:conversation_turn, :user_message, conversation: conversation) }
 
     before do
+      allow(Current).to receive(:conversation).and_return(conversation)
       allow(ConversationTurns::CreateFromTextMessage).to receive(:call).and_return(user_message_turn)
       allow(Chatbot::GenerateResponse).to receive(:call)
       allow(conversation).to receive_message_chain(:conversation_turns, :displayable, :where).and_return(response_messages)
@@ -34,12 +34,22 @@ RSpec.describe Chatbot::ProcessUserMessage do
       )
     end
 
-    it "generates a response using the conversation" do
-      call
+    it "triggers response generation" do
+      expect(Chatbot::GenerateResponse).to receive(:call)
 
-      expect(Chatbot::GenerateResponse).to have_received(:call).with(
-        conversation: conversation
-      )
+      call
+    end
+
+    context "when artifacts are present" do
+      let(:artifacts) { [double("Artifact 1"), double("Artifact 2")] }
+
+      before do
+        allow(Current).to receive(:artifacts).and_return(artifacts)
+      end
+
+      it "returns the artifacts in the result" do
+        expect(call.artifacts).to eq(artifacts)
+      end
     end
 
     context "when an error occurs" do

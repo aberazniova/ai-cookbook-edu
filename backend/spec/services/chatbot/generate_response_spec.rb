@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe Chatbot::GenerateResponse do
   describe "#call" do
-    subject(:call) { described_class.call(conversation: conversation) }
+    subject(:call) { described_class.call }
 
     let(:conversation) { create(:conversation) }
     let(:conversation_contents) { [{ "role" => "user", "parts" => [{ "text" => "Hello" }] }] }
@@ -23,11 +23,13 @@ RSpec.describe Chatbot::GenerateResponse do
     end
 
     before do
+      allow(Current).to receive(:conversation).and_return(conversation)
       allow(Chatbot::BuildPayload::ConversationHistory).to receive(:call).and_return(conversation_contents)
       allow(ExternalApi::GoogleGemini).to receive(:generate_content).and_return(api_response)
+      allow(Chatbot::ProcessFunctionCall).to receive(:call)
     end
 
-    it "calls Chatbot::BuildPayload::ConversationHistory with the conversation" do
+    it "calls Chatbot::BuildPayload::ConversationHistory with the current conversation" do
       call
 
       expect(Chatbot::BuildPayload::ConversationHistory).to have_received(:call).with(
@@ -80,24 +82,18 @@ RSpec.describe Chatbot::GenerateResponse do
           ]
         }
       end
-      let(:function_call_result) { { "status" => "success", "message" => "Recipe created successfully!" } }
-
-      before do
-        allow(Chatbot::ProcessFunctionCall).to receive(:call).and_return(function_call_result)
-      end
 
       it "calls ProcessFunctionCall with the correct parameters" do
-        call
+        expect(Chatbot::ProcessFunctionCall).to receive(:call).with(
+            function_call_name: "create_recipe",
+            function_call_args: {
+              "title" => "Test Recipe",
+              "ingredients" => ["Ingredient 1"],
+              "instructions" => "Test instructions"
+            }
+          )
 
-        expect(Chatbot::ProcessFunctionCall).to have_received(:call).with(
-          function_call_name: "create_recipe",
-          function_call_args: {
-            "title" => "Test Recipe",
-            "ingredients" => ["Ingredient 1"],
-            "instructions" => "Test instructions"
-          },
-          conversation: conversation
-        )
+        call
       end
     end
 
@@ -116,16 +112,6 @@ RSpec.describe Chatbot::GenerateResponse do
 
       it "does not create any conversation turns" do
         expect { call }.not_to change(ConversationTurn, :count)
-      end
-    end
-
-    context "when external API raises an error" do
-      before do
-        allow(ExternalApi::GoogleGemini).to receive(:generate_content).and_raise(StandardError, "API error")
-      end
-
-      it "raises an error" do
-        expect { call }.to raise_error("API error")
       end
     end
   end

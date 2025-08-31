@@ -2,18 +2,23 @@ require "rails_helper"
 
 RSpec.describe Chatbot::FunctionCalls::GetRecipe do
   describe "#call" do
+    subject(:call) { described_class.call(id: recipe_id, user: user) }
+
     let(:user) { create(:user) }
     let(:recipe) { create(:recipe, user: user) }
     let(:recipe_id) { recipe.id }
-    subject(:call) { described_class.call(id: recipe_id, user: user) }
 
     context "when the recipe exists" do
       let(:recipe) { create(:recipe, :with_ingredients, user: user) }
       let(:recipe_id) { recipe.id }
       let(:recipe_detail) { RecipeDetailSerializer.new(recipe).as_json }
 
-      it "returns a success status and the recipe data" do
-        expect(call).to eq({ status: "success", data: recipe_detail })
+      it "saves the function call results with found recipe details" do
+        expect(Chatbot::SaveFunctionCallResults).to receive(:call).with(
+          function_call_name: "get_recipe",
+          response_data: recipe_detail
+        )
+        call
       end
     end
 

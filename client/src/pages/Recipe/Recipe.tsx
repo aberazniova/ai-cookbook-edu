@@ -7,21 +7,21 @@ import {
 
 import RecipeDetails from 'components/RecipeDetails/RecipeDetails';
 import { getRecipe } from 'utils/recipes';
-import { type Recipe as RecipeType } from 'types/recipes';
 import { useAlertStore } from 'stores/alertStore';
 import Skeleton from './Skeleton/Skeleton';
+import { useRecipesStore } from 'stores/recipesStore';
 
 function Recipe() {
   const { id } = useParams<{ id: string }>();
-  const [recipe, setRecipe] = useState<RecipeType>();
   const [loading, setLoading] = useState(true);
 
+  const { setCurrentRecipe, currentRecipe } = useRecipesStore();
   const addAlert = useAlertStore((state) => state.addAlert);
 
   const handleEdit = () => {
     addAlert({
       type: 'info',
-      message: 'Edit functionality is not yet implemented 😊. Please use the AI Chat to edit the recipe.',
+      message: 'Manual edits are not available yet 😊. Please use the AI Assistant to edit the recipe.',
     });
   };
 
@@ -31,7 +31,7 @@ function Recipe() {
         setLoading(true);
         const recipe = await getRecipe(parseInt(id));
 
-        setRecipe(recipe);
+        setCurrentRecipe(recipe);
       } catch (error) {
         addAlert({
           type: 'failure',
@@ -43,7 +43,11 @@ function Recipe() {
     };
 
     fetchRecipe();
-  }, [id, addAlert]);
+
+    return () => {
+      setCurrentRecipe(null);
+    };
+  }, [id, addAlert, setCurrentRecipe]);
 
   if (loading) {
     return (
@@ -51,7 +55,7 @@ function Recipe() {
     )
   }
 
-  if (!recipe) {
+  if (!currentRecipe) {
     return (
       <div className="min-h-screen p-6 md:p-8 flex items-center justify-center bg-cream">
         <div className="text-center">
@@ -99,7 +103,7 @@ function Recipe() {
           </div>
         </div>
 
-        <RecipeDetails loading={loading} recipe={recipe} />
+        <RecipeDetails loading={loading} recipe={currentRecipe} />
       </div>
     </div>
   );

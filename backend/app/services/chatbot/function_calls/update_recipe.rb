@@ -1,10 +1,12 @@
 module Chatbot
   module FunctionCalls
-    class UpdateRecipe < Base
-      def initialize(id:, user:, title: nil, ingredients: nil, instructions: nil, difficulty: nil, summary: nil, cooking_time: nil, servings: nil)
-        super(user: user)
+    class UpdateRecipe
+      include Callable
 
+      def initialize(id:, user:, title: nil, ingredients: nil, instructions: nil, difficulty: nil, summary: nil, cooking_time: nil, servings: nil)
+        @user = user
         @id = id
+
         @params =  {
           title: title,
           ingredients: ingredients,
@@ -19,15 +21,18 @@ module Chatbot
       def call
         updated_recipe = Recipes::UpdateRecipe.call(recipe: recipe, params: params, user: user)
 
-        success_payload(
-          RecipeDetailSerializer.new(updated_recipe).as_json,
-          message: "Recipe updated successfully"
+        Chatbot::SaveFunctionCallResults.call(
+          function_call_name: "update_recipe",
+          message: "Recipe updated successfully",
+          response_data: RecipeCompactSerializer.new(updated_recipe).as_json,
+          artifact_kind: "recipe_updated",
+          artifact_data: RecipeDetailSerializer.new(updated_recipe).as_json
         )
       end
 
       private
 
-      attr_reader :id, :params
+      attr_reader :id, :params, :user
 
       def recipe
         Recipe.find(id)

@@ -1,7 +1,6 @@
 require "rails_helper"
 
 RSpec.describe Chatbot::FunctionCalls::UpdateRecipe do
-  let(:user) { create(:user) }
   subject(:call) do
     described_class.call(
       id: recipe_id,
@@ -16,33 +15,42 @@ RSpec.describe Chatbot::FunctionCalls::UpdateRecipe do
     )
   end
 
+  let(:user) { create(:user) }
   let(:recipe) { create(:recipe, title: "Old Title", instructions: "Old instructions", user: user) }
   let(:recipe_id) { recipe.id }
+
   let!(:old_ingredients) { create_list(:ingredient, 2, recipe: recipe) }
   let(:new_title) { "New Title" }
   let(:new_ingredients) { [{ name: "Salt", amount: 1, unit: "tsp" }] }
   let(:new_instructions) { "New instructions" }
 
-  it "returns a success status and message" do
-    result = call
-    expect(result[:status]).to eq("success")
-    expect(result[:message]).to eq("Recipe updated successfully")
+  before do
+    allow(Chatbot::SaveFunctionCallResults).to receive(:call)
   end
 
-  it "returns the updated recipe detail data" do
-    result = call
+  it "updates the recipe" do
+    call
     recipe.reload
-    expect(result[:data]).to eq({
-      id: recipe.id,
-      title: recipe.title,
-      instructions: recipe.instructions,
-      ingredients: recipe.ingredients.map { |ingredient| { name: ingredient.name, amount: ingredient.amount.to_s, unit: ingredient.unit } },
-      difficulty: recipe.difficulty,
-      summary: recipe.summary,
-      cooking_time: recipe.cooking_time,
-      servings: recipe.servings,
-      image_url: nil
-    })
+
+    expect(recipe.title).to eq(new_title)
+    expect(recipe.instructions).to eq(new_instructions)
+    expect(recipe.ingredients.map(&:name)).to eq(["Salt"])
+    expect(recipe.difficulty).to eq("easy")
+    expect(recipe.summary).to eq("Summary")
+    expect(recipe.cooking_time).to eq(10)
+    expect(recipe.servings).to eq(4)
+  end
+
+  it "saves the function call results" do
+    call
+
+    expect(Chatbot::SaveFunctionCallResults).to have_received(:call).with(
+      function_call_name: "update_recipe",
+      response_data: RecipeCompactSerializer.new(recipe.reload).as_json,
+      message: "Recipe updated successfully",
+      artifact_kind: "recipe_updated",
+      artifact_data: RecipeDetailSerializer.new(recipe.reload).as_json
+    )
   end
 
   context "when only some params are provided" do

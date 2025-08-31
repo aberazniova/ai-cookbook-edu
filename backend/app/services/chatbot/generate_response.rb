@@ -2,10 +2,6 @@ module Chatbot
   class GenerateResponse
     include Callable
 
-    def initialize(conversation:)
-      @conversation = conversation
-    end
-
     def call
       return if parts.empty?
 
@@ -14,15 +10,12 @@ module Chatbot
       if function_call.present?
         Chatbot::ProcessFunctionCall.call(
           function_call_name: function_call.dig("name"),
-          function_call_args: function_call.dig("args"),
-          conversation: conversation
+          function_call_args: function_call.dig("args")
         )
       end
     end
 
     private
-
-    attr_reader :conversation
 
     def api_response
       @_api_response ||= ExternalApi::GoogleGemini.generate_content(conversation_contents)
@@ -51,6 +44,10 @@ module Chatbot
 
     def conversation_contents
       Chatbot::BuildPayload::ConversationHistory.call(conversation: conversation)
+    end
+
+    def conversation
+      Current.conversation
     end
   end
 end

@@ -8,11 +8,10 @@ import { useAlertStore } from 'stores/alertStore';
 import { useAuthStore } from 'stores/authStore';
 
 import { FaRobot as Bot, FaSpinner as Loader2 } from 'react-icons/fa';
+import Artifacts from './Artifacts/Artifacts';
 
 function MessageList() {
-  const messages = useMessagesStore((state) => state.messages);
-  const responseLoading = useMessagesStore((state) => state.responseLoading);
-  const setMessages = useMessagesStore((state) => state.setMessages);
+  const { messages, setMessages, responseLoading } = useMessagesStore();
   const addAlert = useAlertStore((state) => state.addAlert);
   const user = useAuthStore((state) => state.user);
   const messagesEndRef = useRef(null);
@@ -57,23 +56,25 @@ function MessageList() {
   }, [setMessages, addAlert, user]);
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 space-y-4">
+    <div className="flex-1 overflow-y-auto p-4">
       {isLoading && (
         <div className="flex items-center justify-center">
           <Loader2 className="w-6 h-6 animate-spin" />
         </div>
       )}
       <AnimatePresence>
-        {messages.map((message) => (
-          <Message key={message.id} message={message} />
-        ))}
+        <div className="flex-1 space-y-4 mb-4">
+          {messages.map((message) => (
+            <Message key={message.id} message={message} />
+          ))}
+        </div>
       </AnimatePresence>
       {
         responseLoading && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex gap-3"
+            className="flex gap-3 mb-4"
           >
             <div
               className="w-8 h-8 rounded-full flex items-center justify-center bg-sage-green"
@@ -90,7 +91,9 @@ function MessageList() {
         )
       }
 
-      <div ref={messagesEndRef} />
+      <Artifacts />
+
+      <div className="h-0" ref={messagesEndRef} />
     </div >
   );
 }

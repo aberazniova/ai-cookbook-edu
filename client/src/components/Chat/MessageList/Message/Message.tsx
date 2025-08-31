@@ -4,11 +4,10 @@ import { FiUser as UserIcon } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 
 import { type Message as MessageType } from 'types/messages';
-import ViewRecipe from 'components/Chat/MessageList/Message/Actions/ViewRecipe';
 import classNames from 'classnames';
 
 function Message({ message }: { message: MessageType }) {
-  const { textContent, role, id, recipe } = message;
+  const { textContent, role, id } = message;
 
   const isUserMessage = role === 'user';
   const isModelMessage = role === 'model';
@@ -42,15 +41,13 @@ function Message({ message }: { message: MessageType }) {
       >
         <div
           className={classNames({
-            'p-4 rounded-2xl whitespace-pre-wrap leading-relaxed': true,
+            'p-4 rounded-2xl whitespace-pre-wrap': true,
             'text-white shadow-md bg-terracotta text-right': isUserMessage,
             'bg-gray-50 text-gray-900 text-left': isModelMessage,
           })}
         >
           <ReactMarkdown>{textContent}</ReactMarkdown>
         </div>
-
-        {recipe && <ViewRecipe recipe={recipe} />}
       </div>
 
       {isUserMessage && (

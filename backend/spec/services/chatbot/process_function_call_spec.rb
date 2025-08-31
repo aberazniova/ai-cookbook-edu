@@ -2,41 +2,16 @@ require "rails_helper"
 
 RSpec.describe Chatbot::ProcessFunctionCall do
   describe "#call" do
-    subject(:call) { described_class.call(function_call_name: function_call_name, function_call_args: function_call_args, conversation: conversation) }
+    subject(:call) { described_class.call(function_call_name: function_call_name, function_call_args: function_call_args) }
 
     let(:function_call_name) { "create_recipe" }
     let(:function_call_args) { { "title" => "Test Recipe", "ingredients" => ["Ingredient 1"], "instructions" => "Test instructions" } }
     let(:user) { create(:user) }
     let(:conversation) { create(:conversation, user: user) }
-    let(:function_result) { { "status" => "success", "message" => "Recipe saved successfully" } }
 
     before do
-      allow(Chatbot::FunctionCalls::CreateRecipe).to receive(:call).and_return(function_result)
-      allow(ConversationTurns::CreateFromFunctionResponse).to receive(:call)
+      allow(Current).to receive(:conversation).and_return(conversation)
       allow(Chatbot::GenerateResponse).to receive(:call)
-    end
-
-    it "creates a conversation turn with the function response" do
-      expected_function_response = {
-        name: function_call_name,
-        response: function_result
-      }
-
-      call
-
-      expect(ConversationTurns::CreateFromFunctionResponse).to have_received(:call).with(
-        function_call_name: function_call_name,
-        function_response_part: expected_function_response,
-        conversation: conversation
-      )
-    end
-
-    it "generates a response using the conversation" do
-      call
-
-      expect(Chatbot::GenerateResponse).to have_received(:call).with(
-        conversation: conversation
-      )
     end
 
     [
@@ -61,7 +36,7 @@ RSpec.describe Chatbot::ProcessFunctionCall do
         let(:function_call_args) { function_call[:args] }
 
         before do
-          allow(function_call[:service]).to receive(:call).and_return(function_result)
+          allow(function_call[:service]).to receive(:call)
         end
 
         it "calls the #{function_call[:name]} service" do
@@ -73,25 +48,22 @@ RSpec.describe Chatbot::ProcessFunctionCall do
       end
     end
 
+    it "triggers a response generation" do
+      expect(Chatbot::GenerateResponse).to receive(:call)
+      call
+    end
+
     context "when function call name is not supported" do
       let(:function_call_name) { "unsupported_function" }
 
-      it "creates a conversation turn with the error response" do
-        expected_function_response = {
-          name: function_call_name,
-          response: {
-            status: "error",
-            message: "Function call not supported: #{function_call_name}"
-          }
-        }
+      it "saves function call result with the error response" do
+        expect(Chatbot::SaveFunctionCallResults).to receive(:call).with(
+          function_call_name: function_call_name,
+          status: "error",
+          message: "Function call not supported: #{function_call_name}"
+        )
 
         call
-
-        expect(ConversationTurns::CreateFromFunctionResponse).to have_received(:call).with(
-          function_call_name: function_call_name,
-          function_response_part: expected_function_response,
-          conversation: conversation
-        )
       end
     end
 
@@ -100,22 +72,14 @@ RSpec.describe Chatbot::ProcessFunctionCall do
         allow(Chatbot::FunctionCalls::CreateRecipe).to receive(:call).and_raise(StandardError, "Test error")
       end
 
-      it "creates a conversation turn with the error response" do
-        expected_function_response = {
-          name: function_call_name,
-          response: {
-            status: "error",
-            message: "Test error"
-          }
-        }
+      it "saves function call result with the error response" do
+        expect(Chatbot::SaveFunctionCallResults).to receive(:call).with(
+          function_call_name: function_call_name,
+          status: "error",
+          message: "Test error"
+        )
 
         call
-
-        expect(ConversationTurns::CreateFromFunctionResponse).to have_received(:call).with(
-          function_call_name: function_call_name,
-          function_response_part: expected_function_response,
-          conversation: conversation
-        )
       end
     end
   end

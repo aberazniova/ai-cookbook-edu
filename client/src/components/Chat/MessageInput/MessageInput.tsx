@@ -11,11 +11,9 @@ import { useAlertStore } from 'stores/alertStore';
 
 function MessageInput() {
   const [message, setMessage] = useState('');
-  const setResponseLoading = useMessagesStore((state) => state.setResponseLoading);
-  const responseLoading = useMessagesStore((state) => state.responseLoading);
-
-  const addMessage = useMessagesStore((state) => state.addMessage);
   const addAlert = useAlertStore((state) => state.addAlert);
+
+  const { setResponseLoading, responseLoading, addMessage } = useMessagesStore();
 
   const {
     transcript,
@@ -26,7 +24,7 @@ function MessageInput() {
 
   const startListening = () => {
     resetTranscript();
-    SpeechRecognition.startListening({ continuous: true, language: 'en-US' });
+    SpeechRecognition.startListening({ continuous: true });
   };
 
   const stopListening = () => {
@@ -50,19 +48,7 @@ function MessageInput() {
     setResponseLoading(true);
 
     try {
-      const newMessages = await sendMessage(message);
-
-      if (!newMessages) {
-        return;
-      }
-
-      newMessages.forEach((newMessage) => {
-        addMessage({
-          id: String(newMessage.id),
-          textContent: newMessage.textContent,
-          role: newMessage.role,
-        });
-      });
+      await sendMessage(message);
     } catch (error) {
       addAlert({
         type: 'failure',

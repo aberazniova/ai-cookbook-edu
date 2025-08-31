@@ -74,7 +74,7 @@ RSpec.describe "Messages API", type: :request do
 
           it "returns the messages with the correct attributes" do
             do_request
-            expect(json_response[0].keys).to include("text_content", "role", "id", "recipe")
+            expect(json_response[0].keys).to include("text_content", "role", "id")
           end
         end
 
@@ -134,8 +134,8 @@ RSpec.describe "Messages API", type: :request do
       let(:response_messages) { create_list(:conversation_turn, 2, :model) }
 
       before do
-        allow(Chatbot::ProcessUserMessage).to receive(:call).and_return(
-          Struct.new(:success?, :messages, :error).new(true, response_messages, nil)
+        allow(Chatbot::ProcessUserMessage).to receive(:call).with(message_content: message).and_return(
+          Chatbot::ProcessUserMessage::Result.new(true, response_messages, [], nil)
         )
       end
 
@@ -147,13 +147,13 @@ RSpec.describe "Messages API", type: :request do
 
         it "returns all response messages" do
           post "/api/v1/messages", params: params, headers: headers
-          expect(json_response.count).to eq(response_messages.count)
+          expect(json_response["messages"].count).to eq(response_messages.count)
         end
 
         it "returns correct attributes for each message" do
           post "/api/v1/messages", params: params, headers: headers
           response_messages.each_with_index do |msg, index|
-            expect(json_response[index]).to include(
+            expect(json_response["messages"][index]).to include(
               "id" => msg.id,
               "text_content" => msg.text_content,
               "role" => msg.role
@@ -161,18 +161,8 @@ RSpec.describe "Messages API", type: :request do
           end
         end
 
-        context "when conversation id cookie is present" do
+        context "when conversation id cookie is missing" do
           include_examples "creates conversation and sets cookie when missing"
-
-          it "calls Chatbot::ProcessUserMessage with the created conversation" do
-            do_request
-            conversation = Conversation.last
-
-            expect(Chatbot::ProcessUserMessage).to have_received(:call).with(
-              message_content: message,
-              conversation: conversation
-            )
-          end
         end
 
         context "when conversation id cookie is present" do
@@ -184,12 +174,8 @@ RSpec.describe "Messages API", type: :request do
             allow_any_instance_of(Api::V1::MessagesController).to receive(:conversation_id).and_return(conversation.id)
           end
 
-          it "calls Chatbot::ProcessUserMessage with the existing conversation" do
-            expect(Chatbot::ProcessUserMessage).to receive(:call).with(
-              message_content: message,
-              conversation: conversation
-            )
-            do_request
+          it "does not create a new conversation" do
+            expect { do_request }.not_to change { Conversation.count }
           end
         end
       end

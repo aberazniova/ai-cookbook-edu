@@ -5,17 +5,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 import RecipeCard from 'components/RecipesList/RecipeCard/RecipeCard';
 import { getRecipesList } from 'utils/recipes';
-import { type RecipeCard as RecipeCardType } from 'types/recipes';
 import { useAlertStore } from 'stores/alertStore';
 import { useAuthStore } from 'stores/authStore';
 import Skeleton from './Skeleton/Skelehon';
+import { useRecipesStore } from 'stores/recipesStore';
 
 function RecipesList() {
-  const [recipes, setRecipes] = useState<RecipeCardType[]>([]);
   const [loading, setLoading] = useState(true);
 
   const addAlert = useAlertStore((state) => state.addAlert);
   const user = useAuthStore((state) => state.user);
+  const { recipes, setRecipes } = useRecipesStore();
 
   useEffect(() => {
     const fetchRecipes = async () => {
@@ -41,7 +41,11 @@ function RecipesList() {
     };
 
     fetchRecipes();
-  }, [addAlert, user]);
+
+    return () => {
+      setRecipes(null);
+    };
+  }, [addAlert, setRecipes, user]);
 
   if (loading) {
     return (
@@ -71,7 +75,7 @@ function RecipesList() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+          className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6"
         >
           {recipes.map((recipe, index) => (
             <RecipeCard recipe={recipe} key={index} />

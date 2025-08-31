@@ -1,19 +1,13 @@
 import { motion } from 'framer-motion';
-import { Card, Badge } from 'flowbite-react';
+import { Card } from 'flowbite-react';
 import { FiClock as Clock, FiUsers as Users } from 'react-icons/fi';
-import { TbChefHat as ChefHat } from 'react-icons/tb';
 import { Link } from 'react-router-dom';
 
 import { type RecipeCard as RecipeCardType } from 'types/recipes';
 import { defaultRecipeImageCompact } from 'utils/defaultRecipeImages';
+import DifficultyBadge from 'components/Common/DifficultyBadge/DifficultyBadge';
 
 function RecipeCard({ recipe }: { recipe: RecipeCardType }) {
-  const difficultyColors = {
-    easy: "bg-green-100 text-green-800",
-    medium: "bg-yellow-100 text-yellow-800",
-    hard: "bg-red-100 text-red-800"
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -32,9 +26,7 @@ function RecipeCard({ recipe }: { recipe: RecipeCardType }) {
             />
 
             <div className="absolute bottom-3 left-3">
-              <Badge icon={ChefHat} className={`${difficultyColors[recipe.difficulty] || 'bg-gray-100 text-gray-800'} pointer-events-none`}>
-                {recipe.difficulty}
-              </Badge>
+              <DifficultyBadge difficulty={recipe.difficulty} />
             </div>
           </div>
 

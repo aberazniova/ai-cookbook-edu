@@ -1,11 +1,7 @@
 class MessageSerializer < ActiveModel::Serializer
-  attributes :text_content, :role, :id, :recipe
+  attributes :text_content, :role, :id
 
   def role
     object.role.to_s
-  end
-
-  def recipe
-    nil
   end
 end
