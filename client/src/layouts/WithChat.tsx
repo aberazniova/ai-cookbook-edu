@@ -2,29 +2,40 @@ import { Outlet } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Chat from 'components/Chat/Chat';
 import { FiMessageCircle as MessageCircle } from 'react-icons/fi';
+import classNames from 'classnames';
 
 function WithChat() {
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [smallScreen, setSmallScreen] = useState(false);
 
   useEffect(() => {
-    const checkMobile = () => {
-      const mobile = window.innerWidth < 768;
-      setIsChatOpen(!mobile);
+    const checkSmallScreen = () => {
+      const smallScreen = window.innerWidth < 875;
+      setIsChatOpen(!smallScreen);
+      setSmallScreen(smallScreen);
     };
 
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
+    checkSmallScreen();
+    window.addEventListener('resize', checkSmallScreen);
 
-    return () => window.removeEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkSmallScreen);
   }, []);
+
+  const chatOpenOnSmallScreen = () => smallScreen && isChatOpen;
 
   return (
     <>
-      <div className="flex-1 overflow-y-auto">
+      <div className={classNames({
+        "flex-1 overflow-y-auto": true,
+        "hidden": chatOpenOnSmallScreen()
+      })}>
         <Outlet />
       </div>
       {isChatOpen ? (
-        <aside className="bg-slate-200 w-full max-w-lg border-l border-gray-200 flex flex-col rounded-2">
+        <aside className={classNames({
+          "bg-slate-200 w-full border-l border-gray-200 flex flex-col rounded-2": true,
+          "max-w-lg": !chatOpenOnSmallScreen()
+        })}>
           <Chat onClose={() => setIsChatOpen(false)} />
         </aside>
       ) : (
