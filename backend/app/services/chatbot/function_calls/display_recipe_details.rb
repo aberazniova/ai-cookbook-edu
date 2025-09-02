@@ -23,7 +23,7 @@ module Chatbot
       attr_reader :id, :user
 
       def recipe
-        Recipe.find(id)
+        @recipe ||= Recipe.find(id)
       end
 
       def authorise_user!

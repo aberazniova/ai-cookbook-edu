@@ -2,7 +2,7 @@
 class Api::V1::MessagesController < ApplicationController
   before_action :authenticate_user!
   before_action :validate_user_message!, only: :create
-  before_action :set_conversation_to_current, only: :create
+  before_action :set_current_context, only: :create
 
   def create
     result = Chatbot::ProcessUserMessage.call(message_content: user_message)
@@ -61,7 +61,8 @@ class Api::V1::MessagesController < ApplicationController
     render json: { message: "Message must be present." }, status: :bad_request
   end
 
-  def set_conversation_to_current
+  def set_current_context
     Current.conversation = conversation
+    Current.viewed_recipe_id = params[:viewed_recipe_id]
   end
 end

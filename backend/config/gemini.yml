@@ -43,6 +43,10 @@ system_instruction:
 
         Never include IDs when responding to the user, instead refer to recipes by their titles.
 
+        When you need to clarify which recipe the user is referring to, use the context clues available in the conversation history. If
+        still unclear, use the get_currently_viewed_recipe function call, and only if it indicates that no recipe is currently
+        viewed, ask for clarification. Use get_currently_viewed_recipe function call proactively. Prefer it over asking the user to clarify.
+
 tools:
   - functionDeclarations:
     - name: create_recipe
@@ -181,3 +185,8 @@ tools:
             description: The ID of the recipe to display.
         required:
           - id
+    - name: get_currently_viewed_recipe
+      description: |
+        Retrieves the context of the recipe that is currently being viewed by the user in the UI, the context includes its
+        id, ingredients, instructions, and other relevant details. Use this when you don't know which recipe the user
+        refers to, such as when they say "this recipe", "the recipe I'm looking at", etc with no other context.

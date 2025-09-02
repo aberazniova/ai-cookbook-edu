@@ -5,13 +5,17 @@ import camelcaseKeys from 'camelcase-keys';
 import { addMessage } from 'stores/messagesStore';
 import { clearArtifacts } from 'stores/artifactsStore';
 import { handleNewArtifact } from 'utils/artifacts';
+import { getCurrentRecipe } from 'stores/recipesStore';
 
 export const sendMessage = async (message: string): Promise<void> => {
   clearArtifacts();
 
   const response = await authFetch(`${apiBaseUrl}/messages`, {
     method: 'POST',
-    body: JSON.stringify({ message }),
+    body: JSON.stringify({
+      message,
+      viewed_recipe_id: getCurrentRecipe()?.id
+    }),
     credentials: 'include',
   });
   const data = await response.json().catch(() => ({}));
