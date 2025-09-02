@@ -68,10 +68,12 @@ tools:
                   description: The ingredient name, e.g., 'beets'.
                 amount:
                   type: number
-                  description: The quantity amount (optional, decimal supported). If provided, you must also include 'unit'.
+                  description: |
+                    The quantity amount, e.g., '200', '1.5' (optional, decimal supported). If provided, you must
+                    also include 'unit'.
                 unit:
                   type: string
-                  description: The measurement unit, e.g., 'g', 'ml', 'pcs' (optional). If provided, you must also include 'amount'.
+                  description: The measurement unit, e.g., 'g', 'ml', 'pcs' (optional).
               required:
                 - name
           instructions:
@@ -126,10 +128,12 @@ tools:
                   description: The ingredient name, e.g., 'beets'.
                 amount:
                   type: number
-                  description: The quantity amount (optional, decimal supported). If provided, you must also include 'unit'.
+                  description: |
+                    The quantity amount, e.g., '200', '1.5' (optional, decimal supported). If provided, you must
+                    also include 'unit'.
                 unit:
                   type: string
-                  description: The measurement unit, e.g., 'g', 'ml', 'pcs' (optional). If provided, you must also include 'amount'.
+                  description: The measurement unit, e.g., 'g', 'ml', 'pcs' (optional).
               required:
                 - name
           instructions:
