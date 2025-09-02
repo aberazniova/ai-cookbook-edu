@@ -3,6 +3,11 @@ module Chatbot
     include Callable
 
     def call
+      unless response_content.present?
+        Rails.logger.warn("No content returned from Gemini.\n Api response: #{api_response}.\n Conversation id: #{conversation.id}")
+        raise "The model encountered an internal failure while generating a response."
+      end
+
       return if parts.empty?
 
       response_turn = save_response_turn
