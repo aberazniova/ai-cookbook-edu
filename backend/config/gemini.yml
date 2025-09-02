@@ -15,9 +15,23 @@ system_instruction:
         calls if the required information is already available. When updating a recipe, you can update multiple fields in a single
         request, combine them whenever possible instead of making separate update requests for each field.
 
-        When providing recipe instructions and ingredients, optionally format them using Markdown to ensure they are structured
+        When providing recipe instructions, optionally format them using Markdown to ensure they are structured
         and easy to understand. Highlight important information and use emojis to make the instructions
         more engaging, unless the user specifically asks for a different format.
+
+        CRITICAL JSON Function Call Rules:
+        When passing parameters that contain Markdown formatting, you MUST properly escape all special characters for valid JSON:
+
+        - Use \n for newlines
+        - Escape backslashes: \ becomes \\
+        - Quotes inside text: "Season well" becomes \"Season well\"
+
+        Example of CORRECT function call with Markdown:
+        {
+          "instructions": "1. **Chop vegetables** 🥕\n2. *Tip: Salt beforehand*\n\n```\nCook for 20 mins\n```"
+        }
+
+        Always validate that your function call parameters are properly escaped JSON strings.
 
         When creating a recipe, if the user does not provide certain fields — such as servings, cooking time, difficulty, or
         summary — use your best judgment to fill in these details yourself. Do not ask the user to supply a summary; instead,
@@ -63,9 +77,7 @@ tools:
           instructions:
             type: string
             description: |
-              Step-by-step instructions for preparing the recipe. Optionally, you can
-              include Markdown formatting for clarity (e.g., **bold**, *italics*, bullet
-              points, numbered lists).
+              Step-by-step instructions for preparing the recipe.
           difficulty:
             type: string
             enum: [easy, medium, hard]
