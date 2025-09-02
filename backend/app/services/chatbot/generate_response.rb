@@ -12,7 +12,7 @@ module Chatbot
 
       response_turn = save_response_turn
 
-      if function_call.present?
+      function_calls.each do |function_call|
         Chatbot::ProcessFunctionCall.call(
           function_call_name: function_call.dig("name"),
           function_call_args: function_call.dig("args")
@@ -26,10 +26,8 @@ module Chatbot
       @_api_response ||= ExternalApi::GoogleGemini.generate_content(conversation_contents)
     end
 
-    def function_call
-      return @_function_call if defined?(@_function_call)
-
-      @_function_call = parts.filter_map { |p| p["functionCall"] }.first
+    def function_calls
+      @_function_calls ||= parts.filter_map { |p| p["functionCall"] }
     end
 
     def parts

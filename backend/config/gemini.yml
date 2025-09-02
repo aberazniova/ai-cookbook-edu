@@ -166,3 +166,18 @@ tools:
           - id
     - name: get_all_recipes
       description: Retrieves all recipes from the database.
+    - name: display_recipe_details
+      description: |
+        Displays the recipe as an interactive card in the UI.
+        Use this function to display a recipe to the user in the UI, instead of listing the full recipe contents in the text
+        message. This is especially useful when the user asks to find, search, or browse recipes, or when you want to present
+        a summary view of a recipe. Do not use this function after creating or updating a recipe via function calls — displaying
+        the card in those cases is handled automatically by the system.
+      parameters:
+        type: OBJECT
+        properties:
+          id:
+            type: integer
+            description: The ID of the recipe to display.
+        required:
+          - id

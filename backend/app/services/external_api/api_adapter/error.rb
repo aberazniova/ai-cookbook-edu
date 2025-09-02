@@ -13,7 +13,7 @@ module ExternalApi
 
         return base_message if message_from_response.blank?
 
-        base_message + "\n" + message_from_response
+        message_from_response
       end
     end
   end

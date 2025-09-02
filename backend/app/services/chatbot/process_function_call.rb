@@ -2,6 +2,10 @@ module Chatbot
   class ProcessFunctionCall
     include Callable
 
+    FUNCTION_CALLS_WITHOUT_FOLLOW_UP = %w[
+      display_recipe_details
+    ].freeze
+
     def initialize(function_call_name:, function_call_args:)
       @function_call_name = function_call_name
       @function_call_args = function_call_args
@@ -10,7 +14,7 @@ module Chatbot
     def call
       process_based_on_function_call_name
 
-      Chatbot::GenerateResponse.call
+      Chatbot::GenerateResponse.call if generate_follow_up_response?
     end
 
     private
@@ -50,6 +54,10 @@ module Chatbot
 
     def conversation
       Current.conversation
+    end
+
+    def generate_follow_up_response?
+      !FUNCTION_CALLS_WITHOUT_FOLLOW_UP.include?(function_call_name)
     end
   end
 end

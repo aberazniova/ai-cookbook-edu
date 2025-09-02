@@ -10,6 +10,7 @@ function Artifacts() {
     switch (artifact.kind) {
       case 'recipe_created':
       case 'recipe_updated':
+      case 'recipe_details':
         return <ViewRecipe recipe={artifact.data as RecipeCard} />;
       default:
         return null;

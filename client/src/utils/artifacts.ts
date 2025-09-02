@@ -24,9 +24,15 @@ const handleRecipeUpdated = (artifact: Artifact) => {
 };
 
 export const handleNewArtifact = (artifact: Artifact) => {
-  if (artifact.kind === 'recipe_created') {
-    handleRecipeCreated(artifact);
-  } else if (artifact.kind === 'recipe_updated') {
-    handleRecipeUpdated(artifact);
+  switch (artifact.kind) {
+    case 'recipe_created':
+      handleRecipeCreated(artifact);
+      break;
+    case 'recipe_updated':
+      handleRecipeUpdated(artifact);
+      break;
+    default:
+      addArtifact(artifact);
+      break;
   }
 };

@@ -49,9 +49,8 @@ RSpec.describe ExternalApi::GoogleGemini::Client do
         allow(faraday_connection).to receive(:post).and_raise(faraday_error)
       end
 
-      it "raises an ExternalApi::ApiAdapter::Error with an extended message" do
-        expected_error_message = error_message + "\n" + detailed_error_message
-        expect { generate_content }.to raise_error(ExternalApi::ApiAdapter::Error, expected_error_message)
+      it "raises an ExternalApi::ApiAdapter::Error with the error message from the response" do
+        expect { generate_content }.to raise_error(ExternalApi::ApiAdapter::Error, detailed_error_message)
       end
     end
   end
