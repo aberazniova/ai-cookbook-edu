@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { FaSpinner as Loader2 } from 'react-icons/fa';
 import { signIn } from 'utils/auth';
 import { Button, TextInput, Label, Card } from 'flowbite-react';
 import { useAlertStore } from 'stores/alertStore';
@@ -7,11 +8,15 @@ import { useAlertStore } from 'stores/alertStore';
 export default function SignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
   const addAlert = useAlertStore((s) => s.addAlert);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+
     try {
       await signIn(email, password);
     } catch (error) {
@@ -20,7 +25,10 @@ export default function SignIn() {
         message: error?.message || 'Unable to sign in',
       });
       return;
+    } finally {
+      setLoading(false);
     }
+
     navigate('/');
   };
 
@@ -57,7 +65,7 @@ export default function SignIn() {
             type="submit"
             className="w-full bg-sage-green hover:bg-sage-green-800 text-white text-base py-2"
           >
-            Sign In
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Sign In'}
           </Button>
         </form>
         <div className="mt-3 text-sm">
