@@ -11,13 +11,15 @@ module Recipes
     def call
       authorise_update!
 
-      recipe.update!(recipe_params)
+      ActiveRecord::Base.transaction do
+        recipe.update!(recipe_params)
 
-      if params[:ingredients].present?
-        update_ingredients
+        if params[:ingredients].present?
+          update_ingredients
+        end
+
+        recipe
       end
-
-      recipe
     end
 
     private
