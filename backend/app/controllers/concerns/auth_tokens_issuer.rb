@@ -15,8 +15,8 @@ module AuthTokensIssuer
       value: result.raw_token,
       httponly: true,
       secure: Rails.env.production?,
-      same_site: :none,
-      partitioned: true,
+      same_site: Rails.env.production? ? :none : :lax,
+      partitioned: Rails.env.production?,
       path: "/api/v1/auth",
       expires: result.record.expires_at
     }
