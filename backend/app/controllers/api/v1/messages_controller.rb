@@ -34,7 +34,7 @@ class Api::V1::MessagesController < ApplicationController
         value: new_conversation.id,
         httponly: true,
         secure: Rails.env.production?,
-        same_site: :lax
+        same_site: :none
       }
 
       new_conversation
