@@ -2,10 +2,9 @@ module Conversations
   class Create
     include Callable
 
-    INITIAL_MESSAGE_FROM_MODEL = (<<~MSG).squish
-      Hello there! I'm your friendly cooking assistant, here to help you navigate the
-      wonderful world of recipes! 🍳 How can I assist you today?
-    MSG
+    INITIAL_MESSAGE_FROM_MODEL =
+      "Hello there! I'm your friendly cooking assistant, here to help you navigate the " \
+      "wonderful world of recipes! 🍳 How can I assist you today?"
 
     def initialize(user:, with_initial_message: false)
       @user = user
