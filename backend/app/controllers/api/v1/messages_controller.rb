@@ -34,7 +34,8 @@ class Api::V1::MessagesController < ApplicationController
         value: new_conversation.id,
         httponly: true,
         secure: Rails.env.production?,
-        same_site: :none
+        same_site: :none,
+        partitioned: true
       }
 
       new_conversation
