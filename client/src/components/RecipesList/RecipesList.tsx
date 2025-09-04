@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import RecipeCard from 'components/RecipesList/RecipeCard/RecipeCard';
 import { getRecipesList } from 'utils/recipes';
 import { useAlertStore } from 'stores/alertStore';
-import { useAuthStore } from 'stores/authStore';
 import Skeleton from './Skeleton/Skelehon';
 import { useRecipesStore } from 'stores/recipesStore';
 
@@ -14,17 +13,10 @@ function RecipesList() {
   const [loading, setLoading] = useState(true);
 
   const addAlert = useAlertStore((state) => state.addAlert);
-  const user = useAuthStore((state) => state.user);
   const { recipes, setRecipes } = useRecipesStore();
 
   useEffect(() => {
     const fetchRecipes = async () => {
-      if (!user) {
-        setRecipes([]);
-        setLoading(false);
-        return;
-      }
-
       try {
         setLoading(true);
         const recipes = await getRecipesList();
@@ -45,7 +37,7 @@ function RecipesList() {
     return () => {
       setRecipes(null);
     };
-  }, [addAlert, setRecipes, user]);
+  }, [addAlert, setRecipes]);
 
   if (loading) {
     return (
