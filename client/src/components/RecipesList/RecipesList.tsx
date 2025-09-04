@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import RecipeCard from 'components/RecipesList/RecipeCard/RecipeCard';
 import { getRecipesList } from 'utils/recipes';
 import { useAlertStore } from 'stores/alertStore';
-import Skeleton from './Skeleton/Skelehon';
+import Skeleton from './Skeleton/Skeleton';
 import { useRecipesStore } from 'stores/recipesStore';
 
 function RecipesList() {
