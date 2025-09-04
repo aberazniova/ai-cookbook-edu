@@ -58,7 +58,7 @@ function RecipeDetails({ recipe }: Props) {
           type="button"
           className={`
             absolute top-6 right-6 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white rounded-md
-            p-2 w-10 h-10 flex items-center justify-center
+            p-2 w-10 h-10 flex items-center justify-center hidden
           `}
           onClick={() => fileInputRef.current?.click()}
           disabled={isUploading}

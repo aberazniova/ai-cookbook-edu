@@ -17,6 +17,4 @@
 
 class Ingredient < ApplicationRecord
   belongs_to :recipe
-
-  validates :unit, presence: true, if: -> { amount.present? }
 end

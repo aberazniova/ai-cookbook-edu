@@ -40,33 +40,10 @@ RSpec.describe Chatbot::ProcessFunctionCalls do
       call
     end
 
-    context 'when at least one function call requires a follow up response' do
-      let(:function_calls) do
-        [
-          { 'name' => 'display_recipe_details', 'args' => { 'id' => 1 } },
-          { 'name' => 'update_recipe', 'args' => { 'id' => 1 } }
-        ]
-      end
+    it 'triggers follow up response generation' do
+      expect(Chatbot::GenerateResponse).to receive(:call)
 
-      it 'triggers follow up response generation' do
-        expect(Chatbot::GenerateResponse).to receive(:call)
-
-        call
-      end
-    end
-
-    context 'when no function calls require follow up' do
-      let(:function_calls) do
-        [
-          { 'name' => 'display_recipe_details', 'args' => { 'id' => 1 } }
-        ]
-      end
-
-      it 'does not trigger follow up response generation' do
-        expect(Chatbot::GenerateResponse).not_to receive(:call)
-
-        call
-      end
+      call
     end
   end
 end

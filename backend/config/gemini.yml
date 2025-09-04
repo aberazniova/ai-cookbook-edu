@@ -77,9 +77,7 @@ tools:
                   description: The ingredient name, e.g., 'beets'.
                 amount:
                   type: number
-                  description: |
-                    The quantity amount, e.g., '200', '1.5' (optional, decimal supported). If provided, you must
-                    also include 'unit'.
+                  description: The quantity amount, e.g., '200', '1.5' (optional, decimal supported).
                 unit:
                   type: string
                   description: The measurement unit, e.g., 'g', 'ml', 'pcs' (optional).
@@ -137,9 +135,7 @@ tools:
                   description: The ingredient name, e.g., 'beets'.
                 amount:
                   type: number
-                  description: |
-                    The quantity amount, e.g., '200', '1.5' (optional, decimal supported). If provided, you must
-                    also include 'unit'.
+                  description: The quantity amount, e.g., '200', '1.5' (optional, decimal supported).
                 unit:
                   type: string
                   description: The measurement unit, e.g., 'g', 'ml', 'pcs' (optional).
@@ -179,7 +175,7 @@ tools:
       description: Retrieves all recipes from the database.
     - name: display_recipe_details
       description: |
-        Displays the recipe as an interactive card in the UI.
+        Displays the recipe as an interactive card in the UI. The card allows users to view the full recipe details.
         Use this function to display a recipe in the UI, instead of listing the full recipe contents in the text
         message. This is especially useful when the user asks to find, search, or browse recipes, or when you want to present
         a summary view of a recipe. Do not use this function after creating or updating a recipe via function calls — displaying

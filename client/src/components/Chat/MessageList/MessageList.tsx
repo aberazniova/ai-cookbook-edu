@@ -5,7 +5,6 @@ import Message from 'components/Chat/MessageList/Message/Message';
 import { getMessages } from 'utils/messages';
 import { useMessagesStore } from 'stores/messagesStore';
 import { useAlertStore } from 'stores/alertStore';
-import { useAuthStore } from 'stores/authStore';
 
 import { FaRobot as Bot, FaSpinner as Loader2 } from 'react-icons/fa';
 import Artifacts from './Artifacts/Artifacts';
@@ -13,7 +12,6 @@ import Artifacts from './Artifacts/Artifacts';
 function MessageList() {
   const { messages, setMessages, responseLoading } = useMessagesStore();
   const addAlert = useAlertStore((state) => state.addAlert);
-  const user = useAuthStore((state) => state.user);
   const messagesEndRef = useRef(null);
 
   const [isLoading, setIsLoading] = useState(true);
@@ -31,12 +29,6 @@ function MessageList() {
 
   useEffect(() => {
     const fetchMessages = async () => {
-      if (!user) {
-        setMessages([]);
-        setIsLoading(false);
-        return;
-      }
-
       try {
         setIsLoading(true);
 
@@ -53,7 +45,7 @@ function MessageList() {
     };
 
     fetchMessages();
-  }, [setMessages, addAlert, user]);
+  }, [setMessages, addAlert]);
 
   return (
     <div className="flex-1 overflow-y-auto p-4">
