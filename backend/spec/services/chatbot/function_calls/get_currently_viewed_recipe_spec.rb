@@ -1,16 +1,13 @@
 require 'rails_helper'
 
 describe Chatbot::FunctionCalls::GetCurrentlyViewedRecipe do
-  let(:user) { create(:user) }
+  let(:user) { recipe.user }
   let(:recipe) { create(:recipe) }
 
   subject(:call) { described_class.call(user: user) }
 
   before do
     allow(Current).to receive(:viewed_recipe_id).and_return(recipe.id)
-    allow(Pundit).to receive(:authorize).and_return(true)
-    allow(RecipeDetailSerializer).to receive(:new).and_call_original
-    allow(Chatbot::SaveFunctionCallResults).to receive(:call)
   end
 
   describe '#call' do
@@ -20,17 +17,16 @@ describe Chatbot::FunctionCalls::GetCurrentlyViewedRecipe do
         call
       end
 
-      it 'serializes the recipe' do
-        expect(RecipeDetailSerializer).to receive(:new).with(recipe)
-        call
-      end
-
-      it 'saves function call results' do
-        expect(Chatbot::SaveFunctionCallResults).to receive(:call).with(
-          function_call_name: 'get_currently_viewed_recipe',
-          response_data: kind_of(Hash)
-        )
-        call
+      it "returns function response payload with recipe details" do
+        expect(call).to eq({
+          functionResponse: {
+            name: "get_currently_viewed_recipe",
+            response: {
+              status: "success",
+              data: RecipeDetailSerializer.new(recipe).as_json
+            }
+          }
+        })
       end
     end
 
@@ -39,19 +35,21 @@ describe Chatbot::FunctionCalls::GetCurrentlyViewedRecipe do
         allow(Current).to receive(:viewed_recipe_id).and_return(nil)
       end
 
-      it 'saves function call results with no recipe viewed message' do
-        expect(Chatbot::SaveFunctionCallResults).to receive(:call).with(
-          function_call_name: 'get_currently_viewed_recipe',
-          message: 'No recipe is currently viewed'
-        )
-        call
+      it 'returns function response payload with no recipe viewed message' do
+        expect(call).to eq({
+          functionResponse: {
+            name: "get_currently_viewed_recipe",
+            response: {
+              status: "success",
+              message: "No recipe is currently viewed"
+            }
+          }
+        })
       end
     end
 
     context 'when user is not authorized' do
-      before do
-        allow(Pundit).to receive(:authorize).and_raise(Pundit::NotAuthorizedError)
-      end
+      let(:user) { create(:user) }
 
       it 'raises Pundit::NotAuthorizedError' do
         expect { call }.to raise_error(Pundit::NotAuthorizedError)

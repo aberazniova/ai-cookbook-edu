@@ -1,16 +1,10 @@
 require 'rails_helper'
 
 describe Chatbot::FunctionCalls::DisplayRecipeDetails do
-  let(:user) { create(:user) }
+  let(:user) { recipe.user }
   let(:recipe) { create(:recipe) }
 
   subject(:call) { described_class.call(id: recipe.id, user: user) }
-
-  before do
-    allow(Pundit).to receive(:authorize).and_return(true)
-    allow(RecipeCardSerializer).to receive(:new).and_call_original
-    allow(Chatbot::SaveFunctionCallResults).to receive(:call)
-  end
 
   describe '#call' do
     it 'authorizes the user' do
@@ -18,24 +12,28 @@ describe Chatbot::FunctionCalls::DisplayRecipeDetails do
       call
     end
 
-    it 'serializes the recipe' do
-      expect(RecipeCardSerializer).to receive(:new).with(recipe)
-      call
-    end
-
-    it 'calls SaveFunctionCallResults with correct params' do
-      expect(Chatbot::SaveFunctionCallResults).to receive(:call).with(
-        function_call_name: 'display_recipe_details',
-        artifact_kind: 'recipe_details',
-        artifact_data: kind_of(Hash)
+    it 'adds an artifact with the recipe details' do
+      expect(Chatbot::AddArtifact).to receive(:call).with(
+        kind: "recipe_details",
+        data: RecipeCardSerializer.new(recipe).as_json
       )
       call
     end
 
+    it 'returns the function response payload' do
+      expect(call).to eq({
+        functionResponse: {
+          name: "display_recipe_details",
+          response: {
+            status: "success",
+            data: RecipeCardSerializer.new(recipe).as_json
+          }
+        }
+      })
+    end
+
     context 'when user is not authorized' do
-      before do
-        allow(Pundit).to receive(:authorize).and_raise(Pundit::NotAuthorizedError)
-      end
+      let(:user) { create(:user) }
 
       it 'raises Pundit::NotAuthorizedError' do
         expect { call }.to raise_error(Pundit::NotAuthorizedError)

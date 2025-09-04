@@ -30,7 +30,13 @@ function RequireAuth() {
 
   return (
     <>
-      {verifiedAuth ? <Outlet /> : <LoadingSpinner />}
+      {verifiedAuth ? (
+        <Outlet />
+      ) : (
+        <div className="flex-1 content-center">
+          <LoadingSpinner />
+        </div>
+      )}
     </>
   );
 }

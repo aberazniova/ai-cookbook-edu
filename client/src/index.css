@@ -30,3 +30,22 @@ body {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+@layer utilities {
+  .compact-prose :where(h1, h2, h3, h4, blockquote, pre, table) {
+    margin-top: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .compact-prose ul,
+  .compact-prose ol {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    padding-left: 1rem;
+  }
+
+  .compact-prose p {
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+  }
+}

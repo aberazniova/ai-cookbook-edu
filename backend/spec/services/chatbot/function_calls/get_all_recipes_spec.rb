@@ -6,18 +6,17 @@ RSpec.describe Chatbot::FunctionCalls::GetAllRecipes do
 
     let(:user) { create(:user) }
 
-    before do
-      allow(Chatbot::SaveFunctionCallResults).to receive(:call)
-    end
-
     context 'when there are no recipes' do
-      it "saves function call results with an empty data array" do
-        expect(Chatbot::SaveFunctionCallResults).to receive(:call).with(
-          function_call_name: "get_all_recipes",
-          response_data: []
-        )
-
-        call
+      it "returns function response payload with no recipes found" do
+        expect(call).to eq({
+          functionResponse: {
+            name: "get_all_recipes",
+            response: {
+              status: "success",
+              data: []
+            }
+          }
+        })
       end
     end
 
@@ -26,18 +25,21 @@ RSpec.describe Chatbot::FunctionCalls::GetAllRecipes do
       let!(:recipe2) { create(:recipe, title: 'Recipe 2', user: user) }
       let!(:other_user_recipe) { create(:recipe, title: 'Other Recipe', user: create(:user)) }
 
-      it "saves function call results with user recipes details" do
+      it "returns function response payload with user recipes details" do
         expected_recipes_details = ActiveModelSerializers::SerializableResource.new(
           [recipe1, recipe2],
           each_serializer: RecipeDetailSerializer
         ).as_json
 
-        expect(Chatbot::SaveFunctionCallResults).to receive(:call).with(
-          function_call_name: "get_all_recipes",
-          response_data: expected_recipes_details
-        )
-
-        call
+        expect(call).to eq({
+          functionResponse: {
+            name: "get_all_recipes",
+            response: {
+              status: "success",
+              data: expected_recipes_details
+            }
+          }
+        })
       end
     end
   end

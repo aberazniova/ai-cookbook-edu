@@ -14,7 +14,7 @@ function RecipeCard({ recipe }: { recipe: RecipeCardType }) {
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -5 }}
       transition={{ duration: 0.3 }}
-      className="h-full"
+      className="h-full w-full max-w-[500px]"
     >
       <Link to={`recipes/${recipe.id}`} className="h-full block">
         <Card className="overflow-hidden bg-white hover:shadow-xl transition-all duration-300 border-0 shadow-md flex flex-col h-full text-left">

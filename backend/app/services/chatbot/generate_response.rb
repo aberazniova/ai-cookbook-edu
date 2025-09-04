@@ -10,13 +10,10 @@ module Chatbot
 
       return if parts.empty?
 
-      response_turn = save_response_turn
+      save_response_turn
 
-      function_calls.each do |function_call|
-        Chatbot::ProcessFunctionCall.call(
-          function_call_name: function_call.dig("name"),
-          function_call_args: function_call.dig("args")
-        )
+      if function_calls.any?
+        Chatbot::ProcessFunctionCalls.call(function_calls: function_calls)
       end
     end
 

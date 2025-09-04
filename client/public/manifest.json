@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Recipe AI",
+  "name": "Recipe AI - AI-Powered Recipe Book",
   "icons": [
     {
       "src": "favicon.ico",

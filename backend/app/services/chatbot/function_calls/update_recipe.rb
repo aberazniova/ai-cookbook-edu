@@ -19,23 +19,36 @@ module Chatbot
       end
 
       def call
-        updated_recipe = Recipes::UpdateRecipe.call(recipe: recipe, params: params, user: user)
+        authorise_user!
 
-        Chatbot::SaveFunctionCallResults.call(
+        @updated_recipe = Recipes::UpdateRecipe.call(recipe: recipe, params: params, user: user)
+        add_artifact
+
+        Chatbot::BuildPayload::FunctionResponsePart.call(
           function_call_name: "update_recipe",
+          status: "success",
           message: "Recipe updated successfully",
-          response_data: RecipeCompactSerializer.new(updated_recipe).as_json,
-          artifact_kind: "recipe_updated",
-          artifact_data: RecipeDetailSerializer.new(updated_recipe).as_json
+          data: RecipeCompactSerializer.new(updated_recipe).as_json
         )
       end
 
       private
 
-      attr_reader :id, :params, :user
+      attr_reader :id, :params, :user, :updated_recipe
 
       def recipe
-        Recipe.find(id)
+        @recipe ||= Recipe.find(id)
+      end
+
+      def authorise_user!
+        Pundit.authorize(user, recipe, :update?)
+      end
+
+      def add_artifact
+        Chatbot::AddArtifact.call(
+          kind: "recipe_updated",
+          data: RecipeDetailSerializer.new(updated_recipe).as_json
+        )
       end
     end
   end

@@ -10,10 +10,12 @@ module Recipes
     def call
       authorise_user!
 
-      recipe = user.recipes.create!(recipe_params)
-      Recipes::CreateIngredients.call(recipe: recipe, ingredients: ingredients)
+      ActiveRecord::Base.transaction do
+        recipe = user.recipes.create!(recipe_params)
+        Recipes::CreateIngredients.call(recipe: recipe, ingredients: ingredients)
 
-      recipe
+        recipe
+      end
     end
 
     private

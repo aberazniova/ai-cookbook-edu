@@ -15,8 +15,8 @@ RSpec.describe Chatbot::FunctionCalls::UpdateRecipe do
     )
   end
 
-  let(:user) { create(:user) }
-  let(:recipe) { create(:recipe, title: "Old Title", instructions: "Old instructions", user: user) }
+  let(:user) { recipe.user }
+  let(:recipe) { create(:recipe, title: "Old Title", instructions: "Old instructions") }
   let(:recipe_id) { recipe.id }
 
   let!(:old_ingredients) { create_list(:ingredient, 2, recipe: recipe) }
@@ -24,33 +24,25 @@ RSpec.describe Chatbot::FunctionCalls::UpdateRecipe do
   let(:new_ingredients) { [{ name: "Salt", amount: 1, unit: "tsp" }] }
   let(:new_instructions) { "New instructions" }
 
-  before do
-    allow(Chatbot::SaveFunctionCallResults).to receive(:call)
-  end
-
-  it "updates the recipe" do
-    call
-    recipe.reload
-
-    expect(recipe.title).to eq(new_title)
-    expect(recipe.instructions).to eq(new_instructions)
-    expect(recipe.ingredients.map(&:name)).to eq(["Salt"])
-    expect(recipe.difficulty).to eq("easy")
-    expect(recipe.summary).to eq("Summary")
-    expect(recipe.cooking_time).to eq(10)
-    expect(recipe.servings).to eq(4)
-  end
-
-  it "saves the function call results" do
-    call
-
-    expect(Chatbot::SaveFunctionCallResults).to have_received(:call).with(
-      function_call_name: "update_recipe",
-      response_data: RecipeCompactSerializer.new(recipe.reload).as_json,
-      message: "Recipe updated successfully",
-      artifact_kind: "recipe_updated",
-      artifact_data: RecipeDetailSerializer.new(recipe.reload).as_json
+  it "adds an artifact for the updated recipe" do
+    expect(Chatbot::AddArtifact).to receive(:call).with(
+      kind: "recipe_updated",
+      data: hash_including(title: new_title)
     )
+    call
+  end
+
+  it "returns function response payload with updated recipe details" do
+    expect(call).to eq({
+      functionResponse: {
+        name: "update_recipe",
+        response: {
+          status: "success",
+          message: "Recipe updated successfully",
+          data: RecipeCompactSerializer.new(recipe.reload).as_json
+        }
+      }
+    })
   end
 
   context "when only some params are provided" do
@@ -80,6 +72,14 @@ RSpec.describe Chatbot::FunctionCalls::UpdateRecipe do
 
     it "raises a RecordNotFound error" do
       expect { call }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+  end
+
+  context 'when user is not authorized' do
+    let(:user) { create(:user) }
+
+    it 'raises Pundit::NotAuthorizedError' do
+      expect { call }.to raise_error(Pundit::NotAuthorizedError)
     end
   end
 end
