@@ -23,13 +23,11 @@ export const useMessagesStore = create<MessagesStore>(
         set((state) => ({
           messages: [...state.messages, message],
         }))
-        console.log('Message added:', message);
       },
       setMessages: (messages: Message[]) => {
         set(() => ({
           messages,
         }))
-        console.log('Messages set:', messages);
       },
       setResponseLoading: (loading: boolean) => {
         set(() => ({
