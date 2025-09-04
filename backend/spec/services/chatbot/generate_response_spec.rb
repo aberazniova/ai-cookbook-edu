@@ -26,7 +26,7 @@ RSpec.describe Chatbot::GenerateResponse do
       allow(Current).to receive(:conversation).and_return(conversation)
       allow(Chatbot::BuildPayload::ConversationHistory).to receive(:call).and_return(conversation_contents)
       allow(ExternalApi::GoogleGemini).to receive(:generate_content).and_return(api_response)
-      allow(Chatbot::ProcessFunctionCall).to receive(:call)
+      allow(Chatbot::ProcessFunctionCalls).to receive(:call)
     end
 
     it "calls Chatbot::BuildPayload::ConversationHistory with the current conversation" do
@@ -83,14 +83,18 @@ RSpec.describe Chatbot::GenerateResponse do
         }
       end
 
-      it "calls ProcessFunctionCall with the correct parameters" do
-        expect(Chatbot::ProcessFunctionCall).to receive(:call).with(
-            function_call_name: "create_recipe",
-            function_call_args: {
-              "title" => "Test Recipe",
-              "ingredients" => ["Ingredient 1"],
-              "instructions" => "Test instructions"
-            }
+      it "calls ProcessFunctionCalls with the correct parameters" do
+        expect(Chatbot::ProcessFunctionCalls).to receive(:call).with(
+            function_calls: [
+              {
+                "name" => "create_recipe",
+                "args" => {
+                  "title" => "Test Recipe",
+                  "ingredients" => ["Ingredient 1"],
+                  "instructions" => "Test instructions"
+                }
+              }
+            ]
           )
 
         call

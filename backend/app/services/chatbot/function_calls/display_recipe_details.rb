@@ -10,11 +10,12 @@ module Chatbot
 
       def call
         authorise_user!
+        add_artifact
 
-        Chatbot::SaveFunctionCallResults.call(
+        Chatbot::BuildPayload::FunctionResponsePart.call(
           function_call_name: "display_recipe_details",
-          artifact_kind: "recipe_details",
-          artifact_data: RecipeCardSerializer.new(recipe).as_json
+          status: "success",
+          data: RecipeCardSerializer.new(recipe).as_json
         )
       end
 
@@ -28,6 +29,13 @@ module Chatbot
 
       def authorise_user!
         Pundit.authorize(user, recipe, :show?)
+      end
+
+      def add_artifact
+        Chatbot::AddArtifact.call(
+          kind: "recipe_details",
+          data: RecipeCardSerializer.new(recipe).as_json
+        )
       end
     end
   end

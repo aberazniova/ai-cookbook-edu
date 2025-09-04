@@ -9,18 +9,15 @@ module Chatbot
 
       def call
         unless viewed_recipe_id.present?
-          Chatbot::SaveFunctionCallResults.call(
-            function_call_name: "get_currently_viewed_recipe",
-            message: "No recipe is currently viewed"
-          )
-          return
+          return no_recipe_viewed_response
         end
 
         authorise_user!
 
-        Chatbot::SaveFunctionCallResults.call(
+        Chatbot::BuildPayload::FunctionResponsePart.call(
           function_call_name: "get_currently_viewed_recipe",
-          response_data: RecipeDetailSerializer.new(recipe).as_json
+          status: "success",
+          data: RecipeDetailSerializer.new(recipe).as_json
         )
       end
 
@@ -38,6 +35,14 @@ module Chatbot
 
       def authorise_user!
         Pundit.authorize(user, recipe, :show?)
+      end
+
+      def no_recipe_viewed_response
+        Chatbot::BuildPayload::FunctionResponsePart.call(
+          function_call_name: "get_currently_viewed_recipe",
+          status: "success",
+          message: "No recipe is currently viewed"
+        )
       end
     end
   end

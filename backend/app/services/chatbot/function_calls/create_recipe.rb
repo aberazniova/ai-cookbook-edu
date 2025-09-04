@@ -17,20 +17,28 @@ module Chatbot
       end
 
       def call
-        recipe = Recipes::CreateRecipe.call(user: user, params: params)
+        @recipe = Recipes::CreateRecipe.call(user: user, params: params)
 
-        Chatbot::SaveFunctionCallResults.call(
+        add_artifact
+
+        Chatbot::BuildPayload::FunctionResponsePart.call(
           function_call_name: "create_recipe",
+          status: "success",
           message: "Recipe created successfully",
-          response_data: RecipeCompactSerializer.new(recipe).as_json,
-          artifact_kind: "recipe_created",
-          artifact_data: RecipeCardSerializer.new(recipe).as_json
+          data: RecipeCompactSerializer.new(recipe).as_json
         )
       end
 
       private
 
-      attr_reader :params, :user
+      attr_reader :params, :user, :recipe
+
+      def add_artifact
+        Chatbot::AddArtifact.call(
+          kind: "recipe_created",
+          data: RecipeCardSerializer.new(recipe).as_json
+        )
+      end
     end
   end
 end

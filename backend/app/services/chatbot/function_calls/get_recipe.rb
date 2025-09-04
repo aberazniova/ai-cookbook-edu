@@ -11,9 +11,10 @@ module Chatbot
       def call
         authorise_user!
 
-        Chatbot::SaveFunctionCallResults.call(
+        Chatbot::BuildPayload::FunctionResponsePart.call(
           function_call_name: "get_recipe",
-          response_data: RecipeDetailSerializer.new(recipe).as_json
+          status: "success",
+          data: RecipeDetailSerializer.new(recipe).as_json
         )
       end
 

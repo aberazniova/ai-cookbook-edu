@@ -8,9 +8,10 @@ module Chatbot
       end
 
       def call
-        Chatbot::SaveFunctionCallResults.call(
+        Chatbot::BuildPayload::FunctionResponsePart.call(
           function_call_name: "get_all_recipes",
-          response_data: recipes_data,
+          status: "success",
+          data: recipes_data
         )
       end
 

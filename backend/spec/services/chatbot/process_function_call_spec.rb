@@ -48,22 +48,19 @@ RSpec.describe Chatbot::ProcessFunctionCall do
       end
     end
 
-    it "triggers a response generation" do
-      expect(Chatbot::GenerateResponse).to receive(:call)
-      call
-    end
-
     context "when function call name is not supported" do
       let(:function_call_name) { "unsupported_function" }
 
-      it "saves function call result with the error response" do
-        expect(Chatbot::SaveFunctionCallResults).to receive(:call).with(
-          function_call_name: function_call_name,
-          status: "error",
-          message: "Function call not supported: #{function_call_name}"
-        )
-
-        call
+      it "returns function response payload with corresponding error message" do
+        expect(call).to eq({
+          functionResponse: {
+            name: "unsupported_function",
+            response: {
+              status: "error",
+              message: "Function call not supported: unsupported_function"
+            }
+          }
+        })
       end
     end
 
@@ -72,14 +69,16 @@ RSpec.describe Chatbot::ProcessFunctionCall do
         allow(Chatbot::FunctionCalls::CreateRecipe).to receive(:call).and_raise(StandardError, "Test error")
       end
 
-      it "saves function call result with the error response" do
-        expect(Chatbot::SaveFunctionCallResults).to receive(:call).with(
-          function_call_name: function_call_name,
-          status: "error",
-          message: "Test error"
-        )
-
-        call
+      it "returns function response payload with error message" do
+        expect(call).to eq({
+          functionResponse: {
+            name: "create_recipe",
+            response: {
+              status: "error",
+              message: "Test error"
+            }
+          }
+        })
       end
     end
   end

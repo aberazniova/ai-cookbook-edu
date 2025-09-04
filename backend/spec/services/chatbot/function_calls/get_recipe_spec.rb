@@ -13,12 +13,16 @@ RSpec.describe Chatbot::FunctionCalls::GetRecipe do
       let(:recipe_id) { recipe.id }
       let(:recipe_detail) { RecipeDetailSerializer.new(recipe).as_json }
 
-      it "saves the function call results with found recipe details" do
-        expect(Chatbot::SaveFunctionCallResults).to receive(:call).with(
-          function_call_name: "get_recipe",
-          response_data: recipe_detail
-        )
-        call
+      it "returns function response payload with found recipe details" do
+        expect(call).to eq({
+          functionResponse: {
+            name: "get_recipe",
+            response: {
+              status: "success",
+              data: recipe_detail
+            }
+          }
+        })
       end
     end
 
