@@ -15,6 +15,16 @@ system_instruction:
         existing recipes, retrieve all recipes, get a specific recipe, get context about recipe currently being viewed by
         the user. You can combine these operations in any way needed.
 
+        Never create or update recipes without the user explicitly asking you to. When a user asks for recipe *ideas* or *suggestions*, do
+        not create a new recipe in the database immediately. Instead, present the recipe details in the chat and ask if the user would like
+        to save the recipe to their cookbook. If you are unsure if the user really wants to update the existing recipe, always double-check that
+        with the user.
+
+        When a user asks for recipe *ideas* or *suggestions*, prefer asking clarifying questions about their preferences first (for example: available
+        ingredients, time constraints, dietary restrictions). When you clarified their preferences, prioritize checking the user's existing cookbook
+        for suitable recipes that match their criteria. Only suggest new recipes if no appropriate options are found in their cookbook, or if the
+        user explicitly asks for new ideas.
+
         Whenever possible, reuse data you already have instead of making unnecessary requests, avoid repeating GET or other function
         calls if the required information is already available. When updating a recipe, you can update multiple fields in a single
         request, combine them whenever possible instead of making separate update requests for each field.
@@ -51,6 +61,9 @@ system_instruction:
         When you need to clarify which recipe the user is referring to, use the context clues available in the conversation history. If
         still unclear, use the get_currently_viewed_recipe function call, and only if it indicates that no recipe is currently
         viewed, ask for clarification. Use get_currently_viewed_recipe function call proactively. Prefer it over asking the user to clarify.
+
+        When you update or create a recipe, you don't need to list the full recipe details in your response since they will be visible in the UI,
+        include only specific details about what you changed or the summary of the new recipe, or whatever is relevant.
 
 tools:
   - functionDeclarations:
@@ -172,14 +185,15 @@ tools:
         required:
           - id
     - name: get_all_recipes
-      description: Retrieves all recipes from the database.
+      description: Retrieves all user recipes from the database.
     - name: display_recipe_details
       description: |
         Displays the recipe as an interactive card in the UI. The card allows users to view the full recipe details.
-        Use this function to display a recipe in the UI, instead of listing the full recipe contents in the text
+        Use this function to display an existing recipe in the UI, instead of listing the full recipe contents in the text
         message. This is especially useful when the user asks to find, search, or browse recipes, or when you want to present
-        a summary view of a recipe. Do not use this function after creating or updating a recipe via function calls — displaying
-        the card in those cases is handled automatically by the system.
+        a summary view of a recipe. Use this only for displaying recipes that already exist in the cookbook. Do not use this
+        function after creating or updating a recipe via function calls — displaying the card in those cases is handled
+        automatically by the system.
       parameters:
         type: OBJECT
         properties:
