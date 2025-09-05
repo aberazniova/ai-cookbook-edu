@@ -15,7 +15,7 @@ module Chatbot
         Chatbot::BuildPayload::FunctionResponsePart.call(
           function_call_name: "display_recipe_details",
           status: "success",
-          data: RecipeCardSerializer.new(recipe).as_json
+          message: "Recipe details displayed successfully.",
         )
       end
 
