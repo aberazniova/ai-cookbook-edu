@@ -26,7 +26,7 @@ describe Chatbot::FunctionCalls::DisplayRecipeDetails do
           name: "display_recipe_details",
           response: {
             status: "success",
-            data: RecipeCardSerializer.new(recipe).as_json
+            message: "Recipe details displayed successfully."
           }
         }
       })
