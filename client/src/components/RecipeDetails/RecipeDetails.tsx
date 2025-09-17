@@ -98,7 +98,7 @@ function RecipeDetails({ recipe }: Props) {
           <div
             className={`
               space-y-4 prose prose-gray dark:prose-invert prose-p:text-gray-700 dark:prose-p:text-gray-200
-              prose-strong:text-gray-900 dark:prose-strong:text-gray-100 text-base
+              prose-strong:text-gray-900 dark:prose-strong:text-gray-100 text-base max-w-none
               lg:text-lg prose-p:mb-3 prose-p:mt-0 leading-relaxed prose-ul:pl-4
             `}
           >
