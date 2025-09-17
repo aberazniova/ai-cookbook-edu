@@ -21,7 +21,7 @@ export const sendMessage = async (message: string): Promise<void> => {
   const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    throw new Error(`Error processing message! ${data.message || `status: ${response.status}`}`);
+    throw new Error(data.message || `Error processing message! status: ${response.status}`);
   }
 
   const newMessages = camelcaseKeys(data.messages, { deep: true }) as Message[];
