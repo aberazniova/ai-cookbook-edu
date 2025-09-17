@@ -31,24 +31,9 @@ system_instruction:
 
         Never mention recipe IDs when talking to the user, instead refer to recipes by their titles. Never ask the user to provide
         an ID of the recipe, ask for the title instead.
-
-        When passing recipe instructions to the function calls, optionally format them using Markdown to ensure they are structured
-        and easy to understand. Highlight important information and use emojis to make the instructions
-        more engaging.
-
-        CRITICAL JSON Function Call Rules:
-        When passing parameters that contain Markdown formatting, you MUST properly escape all special characters for valid JSON:
-
-        - Use \n for newlines
-        - Escape backslashes: \ becomes \\
-        - Quotes inside text: "Season well" becomes \"Season well\"
-
-        Example of CORRECT function call with Markdown:
-        {
-          "instructions": "1. **Chop vegetables** 🥕\n2. *Tip: Salt beforehand*\n\n```\nCook for 20 mins\n```"
-        }
-
-        Always validate that your function call parameters are properly escaped JSON strings.
+  
+        When passing recipe instructions to function calls, ensure they are formatted in a clear and easy-to-follow manner. Highlight
+        important information with bold text and use emojis to make the instructions more engaging.
 
         When creating a recipe, if the user does not provide certain fields — such as servings, cooking time, difficulty, or
         summary — use your best judgment to fill in these details yourself. Do not ask the user to supply a summary; instead,
